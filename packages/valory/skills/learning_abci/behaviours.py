@@ -23,10 +23,12 @@ from abc import ABC
 from typing import Generator, Set, Type, cast
 
 from packages.valory.skills.learning_abci.models import Params, SharedState
-from packages.valory.skills.learning_abci.payloads import LearningPayload
+from packages.valory.skills.learning_abci.payloads import APICheckPayload, DecisionMakingPayload, TxPreparationPayload
 from packages.valory.skills.learning_abci.rounds import (
     LearningAbciApp,
-    LearningRound,
+    APICheckRound,
+    DecisionMakingRound,
+    TxPreparationRound,
     SynchronizedData,
 )
 from packages.valory.skills.abstract_round_abci.base import AbstractRound
@@ -55,10 +57,10 @@ class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-anc
         return cast(SharedState, self.context.state)
 
 
-class LearningBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
-    """LearningBehaviour"""
+class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
+    """APICheckBehaviour"""
 
-    matching_round: Type[AbstractRound] = LearningRound
+    matching_round: Type[AbstractRound] = APICheckRound
 
     def async_act(self) -> Generator:
         """Do the act, supporting asynchronous execution."""
@@ -67,7 +69,7 @@ class LearningBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
             sender = self.context.agent_address
             payload_content = "Hello world!"
             self.context.logger.info(payload_content)
-            payload = LearningPayload(sender=sender, content=payload_content)
+            payload = APICheckPayload(sender=sender, price=)
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
@@ -76,11 +78,56 @@ class LearningBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
         self.set_done()
 
 
+class DecisionMakingBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
+    """DecisionMakingBehaviour"""
+
+    matching_round: Type[AbstractRound] = DecisionMakingRound
+
+    def async_act(self) -> Generator:
+        """Do the act, supporting asynchronous execution."""
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).local():
+            sender = self.context.agent_address
+            payload_content = "Hello world!"
+            self.context.logger.info(payload_content)
+            payload = DecisionMakingPayload(sender=sender, event=)
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
+            yield from self.send_a2a_transaction(payload)
+            yield from self.wait_until_round_end()
+
+        self.set_done()
+
+
+class TxPreparationBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
+    """TxPreparationBehaviour"""
+
+    matching_round: Type[AbstractRound] = TxPreparationRound
+
+    def async_act(self) -> Generator:
+        """Do the act, supporting asynchronous execution."""
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).local():
+            sender = self.context.agent_address
+            payload_content = "Hello world!"
+            self.context.logger.info(payload_content)
+            payload = TxPreparationPayload(sender=sender, tx_hash=)
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
+            yield from self.send_a2a_transaction(payload)
+            yield from self.wait_until_round_end()
+
+        self.set_done()
+
+
+
 class LearningRoundBehaviour(AbstractRoundBehaviour):
     """LearningRoundBehaviour"""
 
-    initial_behaviour_cls = LearningBehaviour
+    initial_behaviour_cls = APICheckBehaviour
     abci_app_cls = LearningAbciApp  # type: ignore
     behaviours: Set[Type[BaseBehaviour]] = [  # type: ignore
-        LearningBehaviour,
+        APICheckBehaviour,
+        DecisionMakingBehaviour,
+        TxPreparationBehaviour
     ]

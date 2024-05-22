@@ -22,7 +22,7 @@
 from enum import Enum
 from typing import Dict, FrozenSet, Optional, Set
 
-from packages.valory.skills.learning_abci.payloads import LearningPayload
+from packages.valory.skills.learning_abci.payloads import APICheckPayload, DecisionMakingPayload, TxPreparationPayload
 from packages.valory.skills.abstract_round_abci.base import (
     AbciApp,
     AbciAppTransitionFunction,
@@ -41,6 +41,7 @@ class Event(Enum):
     """LearningAbciApp Events"""
 
     DONE = "done"
+    TRANSACT = "transact"
     NO_MAJORITY = "no_majority"
     ROUND_TIMEOUT = "round_timeout"
 
@@ -68,10 +69,10 @@ class SynchronizedData(BaseSynchronizedData):
         return self._get_deserialized("participant_to_learning_round")
 
 
-class LearningRound(CollectSameUntilThresholdRound):
-    """LearningRound"""
+class APICheckRound(CollectSameUntilThresholdRound):
+    """APICheckRound"""
 
-    payload_class = LearningPayload
+    payload_class = APICheckPayload
     synchronized_data_class = SynchronizedData
     done_event = Event.DONE
     no_majority_event = Event.NO_MAJORITY
@@ -81,33 +82,76 @@ class LearningRound(CollectSameUntilThresholdRound):
     # Event.ROUND_TIMEOUT  # this needs to be mentioned for static checkers
 
 
-class FinishedLearningRound(DegenerateRound):
+class DecisionMakingRound(CollectSameUntilThresholdRound):
+    """DecisionMakingRound"""
+
+    payload_class = DecisionMakingPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    no_majority_event = Event.NO_MAJORITY
+    collection_key = get_name(SynchronizedData.participant_to_learning_round)
+    selection_key = get_name(SynchronizedData.learning_data)
+
+    # Event.ROUND_TIMEOUT  # this needs to be mentioned for static checkers
+
+
+class TxPreparationRound(CollectSameUntilThresholdRound):
+    """TxPreparationRound"""
+
+    payload_class = TxPreparationPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    no_majority_event = Event.NO_MAJORITY
+    collection_key = get_name(SynchronizedData.participant_to_learning_round)
+    selection_key = get_name(SynchronizedData.learning_data)
+
+    # Event.ROUND_TIMEOUT  # this needs to be mentioned for static checkers
+
+
+class FinishedDecisionMakingRound(DegenerateRound):
+    """FinishedDecisionMakingRound"""
+
+
+class FinishedTxPreparationRound(DegenerateRound):
     """FinishedLearningRound"""
 
 
 class LearningAbciApp(AbciApp[Event]):
     """LearningAbciApp"""
 
-    initial_round_cls: AppState = LearningRound
+    initial_round_cls: AppState = APICheckRound
     initial_states: Set[AppState] = {
-        LearningRound,
+        APICheckRound,
     }
     transition_function: AbciAppTransitionFunction = {
-        LearningRound: {
-            Event.NO_MAJORITY: LearningRound,
-            Event.ROUND_TIMEOUT: LearningRound,
-            Event.DONE: FinishedLearningRound,
+        APICheckRound: {
+            Event.NO_MAJORITY: APICheckRound,
+            Event.ROUND_TIMEOUT: APICheckRound,
+            Event.DONE: DecisionMakingRound,
         },
-        FinishedLearningRound: {},
+        DecisionMakingRound: {
+            Event.NO_MAJORITY: DecisionMakingRound,
+            Event.ROUND_TIMEOUT: DecisionMakingRound,
+            Event.DONE: FinishedDecisionMakingRound,
+        },
+        TxPreparationRound: {
+            Event.NO_MAJORITY: TxPreparationRound,
+            Event.ROUND_TIMEOUT: TxPreparationRound,
+            Event.DONE: FinishedTxPreparationRound,
+        },
+        FinishedDecisionMakingRound: {},
+        FinishedTxPreparationRound: {},
     }
     final_states: Set[AppState] = {
-        FinishedLearningRound,
+        FinishedDecisionMakingRound,
+        FinishedTxPreparationRound,
     }
     event_to_timeout: EventToTimeout = {}
     cross_period_persisted_keys: FrozenSet[str] = frozenset()
     db_pre_conditions: Dict[AppState, Set[str]] = {
-        LearningRound: set(),
+        APICheckRound: set(),
     }
     db_post_conditions: Dict[AppState, Set[str]] = {
-        FinishedLearningRound: set(),
+        FinishedDecisionMakingRound: set(),
+        FinishedTxPreparationRound: set(),
     }

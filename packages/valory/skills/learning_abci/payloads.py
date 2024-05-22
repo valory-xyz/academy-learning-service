@@ -25,7 +25,21 @@ from packages.valory.skills.abstract_round_abci.base import BaseTxPayload
 
 
 @dataclass(frozen=True)
-class LearningPayload(BaseTxPayload):
-    """Represent a transaction payload for the LearningRound."""
+class APICheckPayload(BaseTxPayload):
+    """Represent a transaction payload for the APICheckRound."""
 
-    content: str
+    price: str
+
+
+@dataclass(frozen=True)
+class DecisionMakingPayload(BaseTxPayload):
+    """Represent a transaction payload for the DecisionMakingRound."""
+
+    event: str
+
+
+@dataclass(frozen=True)
+class TxPreparationPayload(BaseTxPayload):
+    """Represent a transaction payload for the TxPreparationRound."""
+
+    tx_hash: str
