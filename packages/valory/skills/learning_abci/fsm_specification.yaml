@@ -1,0 +1,17 @@
+alphabet_in:
+- DONE
+- NO_MAJORITY
+- ROUND_TIMEOUT
+default_start_state: LearningRound
+final_states:
+- FinishedLearningRound
+label: LearningAbciApp
+start_states:
+- LearningRound
+states:
+- LearningRound
+- FinishedLearningRound
+transition_func:
+    (LearningRound, DONE): FinishedLearningRound
+    (LearningRound, NO_MAJORITY): LearningRound
+    (LearningRound, ROUND_TIMEOUT): LearningRound

@@ -1,0 +1,4 @@
+e66dafccf871ac460213be19e7790cbdbe2db6e4:packages/valory/services/learning/service.yaml:generic-api-key:55
+e66dafccf871ac460213be19e7790cbdbe2db6e4:packages/valory/agents/learning/aea-config.yaml:generic-api-key:123
+e66dafccf871ac460213be19e7790cbdbe2db6e4:packages/valory/skills/learning_abci/skill.yaml:generic-api-key:78
+e66dafccf871ac460213be19e7790cbdbe2db6e4:packages/valory/skills/learning_chained_abci/skill.yaml:generic-api-key:77
