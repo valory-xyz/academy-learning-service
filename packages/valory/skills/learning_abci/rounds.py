@@ -22,7 +22,6 @@
 from enum import Enum
 from typing import Dict, FrozenSet, Optional, Set, Tuple
 
-from packages.valory.skills.learning_abci.payloads import APICheckPayload, DecisionMakingPayload, TxPreparationPayload
 from packages.valory.skills.abstract_round_abci.base import (
     AbciApp,
     AbciAppTransitionFunction,
@@ -34,6 +33,11 @@ from packages.valory.skills.abstract_round_abci.base import (
     DeserializedCollection,
     EventToTimeout,
     get_name,
+)
+from packages.valory.skills.learning_abci.payloads import (
+    APICheckPayload,
+    DecisionMakingPayload,
+    TxPreparationPayload,
 )
 
 

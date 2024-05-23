@@ -19,7 +19,8 @@
 
 """This module contains the shared state for the abci skill of LearningAbciApp."""
 
-from packages.valory.skills.learning_abci.rounds import LearningAbciApp
+from typing import Any
+
 from packages.valory.skills.abstract_round_abci.models import BaseParams
 from packages.valory.skills.abstract_round_abci.models import (
     BenchmarkTool as BaseBenchmarkTool,
@@ -28,7 +29,7 @@ from packages.valory.skills.abstract_round_abci.models import Requests as BaseRe
 from packages.valory.skills.abstract_round_abci.models import (
     SharedState as BaseSharedState,
 )
-from typing import Any
+from packages.valory.skills.learning_abci.rounds import LearningAbciApp
 
 
 class SharedState(BaseSharedState):
@@ -49,7 +50,5 @@ class Params(BaseParams):
         self.coingecko_price_template = self._ensure(
             "coingecko_price_template", kwargs, str
         )
-        self.coingecko_api_key = self._ensure(
-            "coingecko_api_key", kwargs, str
-        )
+        self.coingecko_api_key = self._ensure("coingecko_api_key", kwargs, str)
         super().__init__(*args, **kwargs)

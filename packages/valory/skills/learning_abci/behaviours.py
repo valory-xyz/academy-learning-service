@@ -19,31 +19,37 @@
 
 """This package contains round behaviours of LearningAbciApp."""
 
-from abc import ABC
-from typing import Generator, Set, Type, cast, Optional, Any
 import json
-from packages.valory.skills.learning_abci.models import Params, SharedState
-from packages.valory.skills.learning_abci.payloads import APICheckPayload, DecisionMakingPayload, TxPreparationPayload
-from packages.valory.skills.learning_abci.rounds import (
-    LearningAbciApp,
-    APICheckRound,
-    DecisionMakingRound,
-    TxPreparationRound,
-    SynchronizedData,
-    Event
-)
+from abc import ABC
+from typing import Any, Generator, Optional, Set, Type, cast
+
+from packages.valory.contracts.gnosis_safe.contract import GnosisSafeContract
+from packages.valory.protocols.contract_api import ContractApiMessage
+from packages.valory.protocols.ledger_api import LedgerApiMessage
 from packages.valory.skills.abstract_round_abci.base import AbstractRound
 from packages.valory.skills.abstract_round_abci.behaviours import (
     AbstractRoundBehaviour,
     BaseBehaviour,
 )
-from packages.valory.protocols.ledger_api import LedgerApiMessage
-from packages.valory.contracts.gnosis_safe.contract import GnosisSafeContract
-from packages.valory.protocols.contract_api import ContractApiMessage
+from packages.valory.skills.learning_abci.models import Params, SharedState
+from packages.valory.skills.learning_abci.payloads import (
+    APICheckPayload,
+    DecisionMakingPayload,
+    TxPreparationPayload,
+)
+from packages.valory.skills.learning_abci.rounds import (
+    APICheckRound,
+    DecisionMakingRound,
+    Event,
+    LearningAbciApp,
+    SynchronizedData,
+    TxPreparationRound,
+)
 from packages.valory.skills.transaction_settlement_abci.payload_tools import (
     hash_payload_to_hex,
 )
 from packages.valory.skills.transaction_settlement_abci.rounds import TX_HASH_LENGTH
+
 
 HTTP_OK = 200
 GNOSIS_CHAIN_ID = 100
@@ -51,6 +57,7 @@ TX_DATA = b"0x"
 SAFE_GAS = 0
 VALUE_KEY = "value"
 TO_ADDRESS_KEY = "to_address"
+
 
 class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-ancestors
     """Base behaviour for the learning_abci skill."""
@@ -90,7 +97,6 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
 
         self.set_done()
 
-
     def get_token_price(self) -> Generator[None, None, Optional[float]]:
         """Get token price"""
 
@@ -105,7 +111,9 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
 
         # Handle HTTP errors
         if response.status_code != HTTP_OK:
-            self.context.logger.error(f"Error while pulling the price from CoinGecko: {response.body}")
+            self.context.logger.error(
+                f"Error while pulling the price from CoinGecko: {response.body}"
+            )
 
         # Load the response
         api_data = json.loads(response.body)
@@ -116,7 +124,9 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
         return price
 
 
-class DecisionMakingBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
+class DecisionMakingBehaviour(
+    LearningBaseBehaviour
+):  # pylint: disable=too-many-ancestors
     """DecisionMakingBehaviour"""
 
     matching_round: Type[AbstractRound] = DecisionMakingRound
@@ -135,7 +145,6 @@ class DecisionMakingBehaviour(LearningBaseBehaviour):  # pylint: disable=too-man
 
         self.set_done()
 
-
     def get_next_event(self) -> Generator[None, None, str]:
         """Get the next event"""
         block_number = yield from self.get_block_number()
@@ -143,7 +152,9 @@ class DecisionMakingBehaviour(LearningBaseBehaviour):  # pylint: disable=too-man
         # If we fail to get the block number or the block number is not even,
         # we send the DONE event
         if not block_number or block_number % 2 != 0:
-            self.context.logger.info(f"Block number {[block_number]} is None or odd. Sending the DONE event...")
+            self.context.logger.info(
+                f"Block number {[block_number]} is None or odd. Sending the DONE event..."
+            )
             return Event.DONE.value
 
         # If we fail to get the token price, we send the DONE event
@@ -154,7 +165,6 @@ class DecisionMakingBehaviour(LearningBaseBehaviour):  # pylint: disable=too-man
 
         # Otherwise we send the TRANSACT event
         return Event.TRANSACT.value
-
 
     def get_block_number(self) -> Generator[None, None, Optional[int]]:
         """Get the block number"""
@@ -175,14 +185,14 @@ class DecisionMakingBehaviour(LearningBaseBehaviour):  # pylint: disable=too-man
             int, ledger_api_response.state.body["get_block_number_result"]
         )
 
-        self.context.logger.error(
-            f"Got block number: {block_number}"
-        )
+        self.context.logger.error(f"Got block number: {block_number}")
 
         return block_number
 
 
-class TxPreparationBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
+class TxPreparationBehaviour(
+    LearningBaseBehaviour
+):  # pylint: disable=too-many-ancestors
     """TxPreparationBehaviour"""
 
     matching_round: Type[AbstractRound] = TxPreparationRound
@@ -201,14 +211,9 @@ class TxPreparationBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many
 
         self.set_done()
 
-
     def get_tx_hash(self) -> Generator[None, None, Optional[str]]:
-
         # Send 1 wei to the agent
-        call_data = {
-            VALUE_KEY: 1,
-            TO_ADDRESS_KEY: self.context.agent_address
-        }
+        call_data = {VALUE_KEY: 1, TO_ADDRESS_KEY: self.context.agent_address}
 
         safe_tx_hash = yield from self._build_safe_tx_hash(**call_data)
         if safe_tx_hash is None:
@@ -270,5 +275,5 @@ class LearningRoundBehaviour(AbstractRoundBehaviour):
     behaviours: Set[Type[BaseBehaviour]] = [  # type: ignore
         APICheckBehaviour,
         DecisionMakingBehaviour,
-        TxPreparationBehaviour
+        TxPreparationBehaviour,
     ]
