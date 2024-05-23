@@ -32,12 +32,16 @@ from packages.valory.skills.termination_abci.rounds import (
     Event,
     TerminationAbciApp,
 )
+import packages.valory.skills.transaction_settlement_abci.rounds as TxSettlementAbci
 
 
 abci_app_transition_mapping: AbciAppTransitionMapping = {
-    RegistrationAbci.FinishedRegistrationRound: LearningAbci.LearningRound,
-    LearningAbci.FinishedLearningRound: ResetAndPauseAbci.ResetAndPauseRound,
-    ResetAndPauseAbci.FinishedResetAndPauseRound: LearningAbci.LearningRound,
+    RegistrationAbci.FinishedRegistrationRound: LearningAbci.APICheckRound,
+    LearningAbci.FinishedDecisionMakingRound: ResetAndPauseAbci.ResetAndPauseRound,
+    LearningAbci.FinishedTxPreparationRound: TxSettlementAbci.RandomnessTransactionSubmissionRound,
+    TxSettlementAbci.FinishedTransactionSubmissionRound: ResetAndPauseAbci.ResetAndPauseRound,
+    TxSettlementAbci.FailedRound: TxSettlementAbci.RandomnessTransactionSubmissionRound,
+    ResetAndPauseAbci.FinishedResetAndPauseRound: LearningAbci.APICheckRound,
     ResetAndPauseAbci.FinishedResetAndPauseErrorRound: ResetAndPauseAbci.ResetAndPauseRound,
 }
 
@@ -51,6 +55,7 @@ LearningChainedSkillAbciApp = chain(
     (
         RegistrationAbci.AgentRegistrationAbciApp,
         LearningAbci.LearningAbciApp,
+        TxSettlementAbci.TransactionSubmissionAbciApp,
         ResetAndPauseAbci.ResetPauseAbciApp,
     ),
     abci_app_transition_mapping,
