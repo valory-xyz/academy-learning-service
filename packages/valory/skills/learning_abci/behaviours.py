@@ -161,12 +161,7 @@ class DecisionMakingBehaviour(
             return Event.ERROR.value
 
         # If the timestamp does not end in 0, we send the DONE event
-        now = int(
-            cast(
-                SharedState, self.context.state
-            ).round_sequence.last_round_transition_timestamp.timestamp()
-        )
-
+        now = self.get_sync_timestamp()
         self.context.logger.info(f"Timestamp is {now}")
 
         if now % 5 != 0:
@@ -200,6 +195,14 @@ class DecisionMakingBehaviour(
         self.context.logger.error(f"Got block number: {block_number}")
 
         return block_number
+
+    def get_sync_timestamp(self) -> float:
+        """Get the synchronized time"""
+        now = cast(
+            SharedState, self.context.state
+        ).round_sequence.last_round_transition_timestamp.timestamp()
+
+        return now
 
 
 class TxPreparationBehaviour(
