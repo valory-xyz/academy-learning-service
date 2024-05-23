@@ -1,95 +1,81 @@
-# academy-leraning-agent
+## Learning Service
 
-A template for development with the open-autonomy framework. Find the documentation [here](https://docs.autonolas.network).
+A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy](https://github.com/valory-xyz/open-autonomy).
+
 
 ## System requirements
 
-- Python `>=3.8`
+- Python `>=3.10`
 - [Tendermint](https://docs.tendermint.com/v0.34/introduction/install.html) `==0.34.19`
 - [IPFS node](https://docs.ipfs.io/install/command-line/#official-distributions) `==0.6.0`
 - [Pip](https://pip.pypa.io/en/stable/installation/)
 - [Poetry](https://python-poetry.org/)
 - [Docker Engine](https://docs.docker.com/engine/install/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
+- [Set Docker permissions so you can run containers as non-root user](https://docs.docker.com/engine/install/linux-postinstall/)
 
-Alternatively, you can fetch this docker image with the relevant requirements satisfied:
 
-> **_NOTE:_**  Tendermint and IPFS dependencies are missing from the image at the moment.
+## Run you own agent
 
-```bash
-docker pull valory/open-autonomy-user:latest
-docker container run -it valory/open-autonomy-user:latest
-```
+### Get the code
 
-## This repository contains:
+1. Clone this repo:
 
-- A directory, `packages`, which acts as the local registry
+    ```
+    git clone git@github.com:valory-xyz/academy-learning-service.git
+    ```
 
-- Pre-filled in third-party core packages
+2. Create the virtual environment:
 
-- Basic example of a simple skill, a chained skill, an agent and a service
-
-- .env sample file with Python path updated to include packages directory
-
-## How to use
-
-1. Create a virtual environment with all development dependencies:
-
-    ```bash
+    ```
+    cd academy-learning-service
     poetry shell
     poetry install
+    ```
+
+3. Sync packages:
+
+    ```
     autonomy packages sync --update-packages
     ```
 
-2. Prepare an `ethereum_private_key.txt` (for agents) file and `keys.json` (for services) files containing wallet address and/or the private key for each of the agents. You can generate a new key by running `autonomy generate-key ethereum`. This is how those files hsould look like:
+### Prepare the data
 
-    ethereum_private_key.txt (check that there are no newlines at the end)
+1. Prepare a keys.json file containing wallet address and the private key for each of the four agents.
 
     ```
-    0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+    autonomy generate-key ethereum -n 4
     ```
 
-    keys.json
+2. Deploy a [Safe on Gnosis](https://app.safe.global/welcome) (it's free) and set your agent addresses as signers. Set the signature threshold to 3 out of 4.
+
+3. Fund your agents and Safe with a small amount of xDAI, i.e. $0.02 each.
+
+
+### Run the service
+
+1. Make a copy of the env file:
+
     ```
-    [
-        {
-            "address": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-            "private_key": "0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a"
-        }
-    ]
-    ```
-
-3. Modify `packages/valory/agents/learning_agent/aea-config.yaml` so `all_participants` contains your agent's public address.
-
-
-5. Make a copy of the env file:
-
-    ```cp sample.env .env```
-
-5. Fill in the required environment variables in .env. You'll need a Ethereum RPC. `ALL_PARTICIPANTS` needs to contain your agent's public address.
-
-
-6. Test the agent
-
-    ```bash
-    bash run_agent.py
+    cp sample.env .env
     ```
 
-    and in other terminal run Tendermint:
+2. Fill in the required environment variables in .env. These variables are: `ALL_PARTICIPANTS`, `GNOSIS_LEDGER_RPC`, `COINGECKO_API_KEY` and `SAFE_CONTRACT_ADDRESS`. You will need to get a [Coingecko](https://www.coingecko.com/) free API and a [Tenderly](https://tenderly.co/) fork RPC (or alternatively an actual mainnet RPC if you want to run against the real chain).
 
-    ```bash
-    make tm
+3. Check that Docker is running:
+
+    ```
+    docker
     ```
 
-7. Test the service
+4. Run the service:
 
-    ```bash
-    bash run_service.py
+    ```
+    bash run_service.sh
     ```
 
-8. Get developing...
+5. Look at the service logs (on another terminal):
 
-## Useful commands:
-
-Check out the `Makefile` for useful commands, e.g. `make formatters`, `make generators`, `make code-checks`, as well
-as `make common-checks-1`. To run tests use the `autonomy test` command. Run `autonomy test --help` for help about its usage.
+    ```
+    docker logs -f learningservice_abci_0
+    ```
