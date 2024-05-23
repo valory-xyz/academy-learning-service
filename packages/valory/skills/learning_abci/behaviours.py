@@ -149,15 +149,22 @@ class DecisionMakingBehaviour(
         """Get the next event"""
         block_number = yield from self.get_block_number()
 
-        # If we fail to get the block number, we send the DONE event
+        # If we fail to get the block number, we send the ERROR event
         if not block_number:
-            self.context.logger.info("Block number is None. Sending the DONE event...")
-            return Event.DONE.value
+            self.context.logger.info("Block number is None. Sending the ERROR event...")
+            return Event.ERROR.value
 
-        # If we fail to get the token price, we send the DONE event
+        # If we fail to get the token price, we send the ERROR event
         token_price = self.synchronized_data.price
         if not token_price:
-            self.context.logger.info("Token price is None. Sending the DONE event...")
+            self.context.logger.info("Token price is None. Sending the ERROR event...")
+            return Event.ERROR.value
+
+        # If the block number does not end in 0, we send the DONE event
+        if not block_number or block_number % 10 != 0:
+            self.context.logger.info(
+                f"Block number [{block_number}] is None. Sending the DONE event..."
+            )
             return Event.DONE.value
 
         # Otherwise we send the TRANSACT event

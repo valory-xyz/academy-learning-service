@@ -45,6 +45,7 @@ class Event(Enum):
     """LearningAbciApp Events"""
 
     DONE = "done"
+    ERROR = "error"
     TRANSACT = "transact"
     NO_MAJORITY = "no_majority"
     ROUND_TIMEOUT = "round_timeout"
@@ -157,6 +158,7 @@ class LearningAbciApp(AbciApp[Event]):
             Event.NO_MAJORITY: DecisionMakingRound,
             Event.ROUND_TIMEOUT: DecisionMakingRound,
             Event.DONE: FinishedDecisionMakingRound,
+            Event.ERROR: FinishedDecisionMakingRound,
             Event.TRANSACT: TxPreparationRound,
         },
         TxPreparationRound: {
