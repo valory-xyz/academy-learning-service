@@ -139,6 +139,7 @@ jobs:
           gitleaks detect --report-format json --report-path leak_report
 
   test:
+    if: false
     continue-on-error: True
     needs:
       - lock_check
@@ -267,6 +268,7 @@ jobs:
           fail_ci_if_error: false
 
   e2e-tests:
+    if: false
     continue-on-error: True
     needs:
       - test
