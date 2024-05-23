@@ -164,7 +164,7 @@ class DecisionMakingBehaviour(
         now = self.get_sync_timestamp()
         self.context.logger.info(f"Timestamp is {now}")
 
-        if now % 5 != 0:
+        if int(now) % 5 != 0:
             self.context.logger.info(
                 "Timestamp does not end in 0. Sending the DONE event..."
             )
