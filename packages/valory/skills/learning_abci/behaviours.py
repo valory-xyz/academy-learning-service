@@ -160,10 +160,18 @@ class DecisionMakingBehaviour(
             self.context.logger.info("Token price is None. Sending the ERROR event...")
             return Event.ERROR.value
 
-        # If the block number does not end in 0, we send the DONE event
-        if not block_number or block_number % 10 != 0:
+        # If the timestamp does not end in 0, we send the DONE event
+        now = int(
+            cast(
+                SharedState, self.context.state
+            ).round_sequence.last_round_transition_timestamp.timestamp()
+        )
+
+        self.context.logger.info(f"Timestamp is {now}")
+
+        if now % 5 != 0:
             self.context.logger.info(
-                f"Block number [{block_number}] is None. Sending the DONE event..."
+                "Timestamp does not end in 0. Sending the DONE event..."
             )
             return Event.DONE.value
 
