@@ -210,7 +210,7 @@ class TxPreparationBehaviour(
 
     def get_tx_hash(self) -> Generator[None, None, Optional[str]]:
         # Send 1 wei to the agent
-        call_data = {VALUE_KEY: 1, TO_ADDRESS_KEY: self.context.agent_address}
+        call_data = {VALUE_KEY: 1, TO_ADDRESS_KEY: self.params.transfer_target_address}
 
         safe_tx_hash = yield from self._build_safe_tx_hash(**call_data)
         if safe_tx_hash is None:

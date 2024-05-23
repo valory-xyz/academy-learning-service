@@ -51,4 +51,7 @@ class Params(BaseParams):
             "coingecko_price_template", kwargs, str
         )
         self.coingecko_api_key = kwargs.get("coingecko_api_key", None)
+        self.transfer_target_address = self._ensure(
+            "transfer_target_address", kwargs, str
+        )
         super().__init__(*args, **kwargs)
