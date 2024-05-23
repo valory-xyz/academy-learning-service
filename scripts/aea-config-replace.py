@@ -49,7 +49,7 @@ def main() -> None:
         if os.getenv("COINGECKO_API_KEY"):
             config[-1]["models"]["params"]["args"][
                 "coingecko_api_key"
-            ] = f"${{int:{int(os.getenv('COINGECKO_API_KEY'))}}}"  # type: ignore
+            ] = f"${{str:{os.getenv('COINGECKO_API_KEY')}}}"  # type: ignore
 
     with open(Path("learning_agent", "aea-config.yaml"), "w", encoding="utf-8") as file:
         yaml.dump_all(config, file, sort_keys=False)
