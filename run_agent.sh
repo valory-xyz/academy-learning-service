@@ -3,6 +3,9 @@ if test -d learning_agent; then
   rm -r learning_agent
 fi
 
+source .env
+python scripts/aea-config-replace.py
+
 find . -empty -type d -delete  # remove empty directories to avoid wrong hashes
 autonomy packages lock
 autonomy fetch --local --agent valory/learning_agent && cd learning_agent
