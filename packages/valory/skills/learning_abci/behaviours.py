@@ -224,6 +224,7 @@ class TxPreparationBehaviour(
         self.set_done()
 
     def get_tx_hash(self) -> Generator[None, None, Optional[str]]:
+        """Get the transaction hash"""
         # Send 1 wei to the agent
         call_data = {VALUE_KEY: 1, TO_ADDRESS_KEY: self.params.transfer_target_address}
 
