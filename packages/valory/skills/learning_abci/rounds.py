@@ -83,6 +83,11 @@ class SynchronizedData(BaseSynchronizedData):
         """Get the participants to the tx round."""
         return self._get_deserialized("participant_to_tx_round")
 
+    @property
+    def tx_submitter(self) -> str:
+        """Get the round that submitted a tx to transaction_settlement_abci."""
+        return str(self.db.get_strict("tx_submitter"))
+
 
 class APICheckRound(CollectSameUntilThresholdRound):
     """APICheckRound"""
@@ -128,7 +133,10 @@ class TxPreparationRound(CollectSameUntilThresholdRound):
     done_event = Event.DONE
     no_majority_event = Event.NO_MAJORITY
     collection_key = get_name(SynchronizedData.participant_to_tx_round)
-    selection_key = get_name(SynchronizedData.most_voted_tx_hash)
+    selection_key = (
+        get_name(SynchronizedData.tx_submitter),
+        get_name(SynchronizedData.most_voted_tx_hash),
+    )
 
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 

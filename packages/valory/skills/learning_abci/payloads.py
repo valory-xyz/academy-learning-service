@@ -43,4 +43,5 @@ class DecisionMakingPayload(BaseTxPayload):
 class TxPreparationPayload(BaseTxPayload):
     """Represent a transaction payload for the TxPreparationRound."""
 
-    tx_hash: str
+    tx_submitter: Optional[str] = None
+    tx_hash: Optional[str] = None
