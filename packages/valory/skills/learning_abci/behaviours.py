@@ -166,7 +166,7 @@ class DecisionMakingBehaviour(
 
         if int(now) % 5 != 0:
             self.context.logger.info(
-                "Timestamp does not end in 0. Sending the DONE event..."
+                f"Timestamp [{int(now)}] is not divisible by 5. Sending the DONE event..."
             )
             return Event.DONE.value
 
