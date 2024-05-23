@@ -52,7 +52,7 @@ from packages.valory.skills.transaction_settlement_abci.rounds import TX_HASH_LE
 
 
 HTTP_OK = 200
-GNOSIS_CHAIN_ID = 100
+GNOSIS_CHAIN_ID = "gnosis"
 TX_DATA = b"0x"
 SAFE_GAS = 0
 VALUE_KEY = "value"
@@ -101,7 +101,7 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
         """Get token price"""
 
         url_template = self.params.coingecko_price_template
-        url = url_template.replace("{coingecko_api_key}", self.params.coingecko_api_key)
+        url = url_template.replace("{api_key}", self.params.coingecko_api_key)
         headers = {"accept": "application/json"}
 
         # Make the HTTP request to Coingecko API
@@ -149,18 +149,15 @@ class DecisionMakingBehaviour(
         """Get the next event"""
         block_number = yield from self.get_block_number()
 
-        # If we fail to get the block number or the block number is not even,
-        # we send the DONE event
-        if not block_number or block_number % 2 != 0:
-            self.context.logger.info(
-                f"Block number {[block_number]} is None or odd. Sending the DONE event..."
-            )
+        # If we fail to get the block number, we send the DONE event
+        if not block_number:
+            self.context.logger.info("Block number is None. Sending the DONE event...")
             return Event.DONE.value
 
         # If we fail to get the token price, we send the DONE event
         token_price = self.synchronized_data.price
         if not token_price:
-            self.context.logger.info(f"Token price is None. Sending the DONE event...")
+            self.context.logger.info("Token price is None. Sending the DONE event...")
             return Event.DONE.value
 
         # Otherwise we send the TRANSACT event
@@ -236,6 +233,11 @@ class TxPreparationBehaviour(
         self, **kwargs: Any
     ) -> Generator[None, None, Optional[str]]:
         """Prepares and returns the safe tx hash for a multisend tx."""
+
+        self.context.logger.info(
+            f"Preparing Transfer transaction for Safe [{self.synchronized_data.safe_contract_address}]: {kwargs}"
+        )
+
         response_msg = yield from self.get_contract_api_response(
             performative=ContractApiMessage.Performative.GET_STATE,  # type: ignore
             contract_address=self.synchronized_data.safe_contract_address,
