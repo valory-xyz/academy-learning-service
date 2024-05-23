@@ -117,7 +117,7 @@ class DecisionMakingRound(CollectSameUntilThresholdRound):
 
         return None
 
-    # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
+    # Event.DONE, Event.ERROR, Event.TRANSACT, Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
 
 class TxPreparationRound(CollectSameUntilThresholdRound):
