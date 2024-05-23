@@ -50,5 +50,5 @@ class Params(BaseParams):
         self.coingecko_price_template = self._ensure(
             "coingecko_price_template", kwargs, str
         )
-        self.coingecko_api_key = self._ensure("coingecko_api_key", kwargs, str)
+        self.coingecko_api_key = kwargs.get("coingecko_api_key", None)
         super().__init__(*args, **kwargs)

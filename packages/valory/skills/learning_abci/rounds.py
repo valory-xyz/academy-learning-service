@@ -177,5 +177,5 @@ class LearningAbciApp(AbciApp[Event]):
     }
     db_post_conditions: Dict[AppState, Set[str]] = {
         FinishedDecisionMakingRound: set(),
-        FinishedTxPreparationRound: set(),
+        FinishedTxPreparationRound: {get_name(SynchronizedData.most_voted_tx_hash)},
     }
