@@ -20,6 +20,7 @@
 """This module contains the transaction payloads of the LearningAbciApp."""
 
 from dataclasses import dataclass
+from typing import Optional
 
 from packages.valory.skills.abstract_round_abci.base import BaseTxPayload
 
@@ -28,7 +29,7 @@ from packages.valory.skills.abstract_round_abci.base import BaseTxPayload
 class APICheckPayload(BaseTxPayload):
     """Represent a transaction payload for the APICheckRound."""
 
-    price: str
+    price: Optional[float]
 
 
 @dataclass(frozen=True)

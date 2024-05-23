@@ -28,6 +28,7 @@ from packages.valory.skills.abstract_round_abci.models import Requests as BaseRe
 from packages.valory.skills.abstract_round_abci.models import (
     SharedState as BaseSharedState,
 )
+from typing import Any
 
 
 class SharedState(BaseSharedState):
@@ -38,4 +39,17 @@ class SharedState(BaseSharedState):
 
 Requests = BaseRequests
 BenchmarkTool = BaseBenchmarkTool
-Params = BaseParams
+
+
+class Params(BaseParams):
+    """Parameters."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize the parameters object."""
+        self.coingecko_price_template = self._ensure(
+            "coingecko_price_template", kwargs, str
+        )
+        self.coingecko_api_key = self._ensure(
+            "coingecko_api_key", kwargs, str
+        )
+        super().__init__(*args, **kwargs)

@@ -20,7 +20,7 @@
 """This package contains the rounds of LearningAbciApp."""
 
 from enum import Enum
-from typing import Dict, FrozenSet, Optional, Set
+from typing import Dict, FrozenSet, Optional, Set, Tuple
 
 from packages.valory.skills.learning_abci.payloads import APICheckPayload, DecisionMakingPayload, TxPreparationPayload
 from packages.valory.skills.abstract_round_abci.base import (
@@ -59,14 +59,24 @@ class SynchronizedData(BaseSynchronizedData):
         return CollectionRound.deserialize_collection(serialized)
 
     @property
-    def learning_data(self) -> Optional[str]:
-        """Get the learning_data."""
-        return self.db.get("learning_data", None)
+    def price(self) -> Optional[float]:
+        """Get the token price."""
+        return self.db.get("price", None)
 
     @property
-    def participant_to_learning_round(self) -> DeserializedCollection:
-        """Get the participants to the learning round."""
-        return self._get_deserialized("participant_to_learning_round")
+    def participant_to_price_round(self) -> DeserializedCollection:
+        """Get the participants to the price round."""
+        return self._get_deserialized("participant_to_price_round")
+
+    @property
+    def most_voted_tx_hash(self) -> Optional[float]:
+        """Get the token most_voted_tx_hash."""
+        return self.db.get("most_voted_tx_hash", None)
+
+    @property
+    def participant_to_tx_round(self) -> DeserializedCollection:
+        """Get the participants to the tx round."""
+        return self._get_deserialized("participant_to_tx_round")
 
 
 class APICheckRound(CollectSameUntilThresholdRound):
@@ -76,10 +86,10 @@ class APICheckRound(CollectSameUntilThresholdRound):
     synchronized_data_class = SynchronizedData
     done_event = Event.DONE
     no_majority_event = Event.NO_MAJORITY
-    collection_key = get_name(SynchronizedData.participant_to_learning_round)
-    selection_key = get_name(SynchronizedData.learning_data)
+    collection_key = get_name(SynchronizedData.participant_to_price_round)
+    selection_key = get_name(SynchronizedData.price)
 
-    # Event.ROUND_TIMEOUT  # this needs to be mentioned for static checkers
+    # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
 
 class DecisionMakingRound(CollectSameUntilThresholdRound):
@@ -87,12 +97,22 @@ class DecisionMakingRound(CollectSameUntilThresholdRound):
 
     payload_class = DecisionMakingPayload
     synchronized_data_class = SynchronizedData
-    done_event = Event.DONE
-    no_majority_event = Event.NO_MAJORITY
-    collection_key = get_name(SynchronizedData.participant_to_learning_round)
-    selection_key = get_name(SynchronizedData.learning_data)
 
-    # Event.ROUND_TIMEOUT  # this needs to be mentioned for static checkers
+    def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Event]]:
+        """Process the end of the block."""
+
+        if self.threshold_reached:
+            event = Event(self.most_voted_payload)
+            return self.synchronized_data, event
+
+        if not self.is_majority_possible(
+            self.collection, self.synchronized_data.nb_participants
+        ):
+            return self.synchronized_data, Event.NO_MAJORITY
+
+        return None
+
+    # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
 
 class TxPreparationRound(CollectSameUntilThresholdRound):
@@ -102,10 +122,10 @@ class TxPreparationRound(CollectSameUntilThresholdRound):
     synchronized_data_class = SynchronizedData
     done_event = Event.DONE
     no_majority_event = Event.NO_MAJORITY
-    collection_key = get_name(SynchronizedData.participant_to_learning_round)
-    selection_key = get_name(SynchronizedData.learning_data)
+    collection_key = get_name(SynchronizedData.participant_to_tx_round)
+    selection_key = get_name(SynchronizedData.most_voted_tx_hash)
 
-    # Event.ROUND_TIMEOUT  # this needs to be mentioned for static checkers
+    # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
 
 class FinishedDecisionMakingRound(DegenerateRound):
