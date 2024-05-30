@@ -42,7 +42,7 @@ abci_app_transition_mapping: AbciAppTransitionMapping = {
     TxSettlementAbci.FinishedTransactionSubmissionRound: ResetAndPauseAbci.ResetAndPauseRound,
     TxSettlementAbci.FailedRound: TxSettlementAbci.RandomnessTransactionSubmissionRound,
     ResetAndPauseAbci.FinishedResetAndPauseRound: LearningAbci.APICheckRound,
-    ResetAndPauseAbci.FinishedResetAndPauseErrorRound: ResetAndPauseAbci.ResetAndPauseRound,
+    ResetAndPauseAbci.FinishedResetAndPauseErrorRound: RegistrationAbci.RegistrationRound,
 }
 
 termination_config = BackgroundAppConfig(
