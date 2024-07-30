@@ -68,7 +68,7 @@ class SharedState(BaseSharedState):
 
 
 class Params(  # pylint: disable=too-many-ancestors
-    TerminationParams,
     LearningParams,
+    TerminationParams,
 ):
     """A model to represent params for multiple abci apps."""
