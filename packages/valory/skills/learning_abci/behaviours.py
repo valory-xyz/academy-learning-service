@@ -131,6 +131,7 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
             f"Getting Olas balance for Safe {self.synchronized_data.safe_contract_address}"
         )
 
+        # Use the contract api to interact with the ERC20 contract
         response_msg = yield from self.get_contract_api_response(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
             contract_address=self.params.olas_token_address,
@@ -139,6 +140,8 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
             account=self.synchronized_data.safe_contract_address,
             chain_id=GNOSIS_CHAIN_ID,
         )
+
+        # Check that the response is what we expect
         if response_msg.performative != ContractApiMessage.Performative.RAW_TRANSACTION:
             self.context.logger.error(
                 f"Error while retrieving the balance: {response_msg}"
@@ -146,13 +149,15 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
             return None
 
         balance = response_msg.raw_transaction.body.get("token", None)
+
+        # Ensure that the balance is not None
         if balance is None:
             self.context.logger.error(
                 f"Error while retrieving the balance:  {response_msg}"
             )
             return None
 
-        balance = balance / 10**18
+        balance = balance / 10**18  # from wei
 
         self.context.logger.info(
             f"Account {self.synchronized_data.safe_contract_address} has {balance} Olas"
