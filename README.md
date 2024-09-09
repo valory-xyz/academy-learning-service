@@ -47,30 +47,34 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
     autonomy generate-key ethereum -n 4
     ```
 
-2. Deploy a [Safe on Gnosis](https://app.safe.global/welcome) (it's free) and set your agent addresses as signers. Set the signature threshold to 3 out of 4.
+2. Prepare a `ethereum_private_key.txt` file containing one of the private keys from `keys.json`. Ensure that there is no newline at the end.
 
-3. Create a [Tenderly](https://tenderly.co/) account and from your dashboard create a fork of Gnosis chain (virtual testnet).
+3. Deploy a [Safe on Gnosis](https://app.safe.global/welcome) (it's free) and set your agent addresses as signers. Set the signature threshold to 3 out of 4.
 
-4. From Tenderly, fund your agents and Safe with a small amount of xDAI, i.e. $0.02 each.
+4. Create a [Tenderly](https://tenderly.co/) account and from your dashboard create a fork of Gnosis chain (virtual testnet).
 
-5. Make a copy of the env file:
+5. From Tenderly, fund your agents and Safe with a small amount of xDAI, i.e. $0.02 each.
+
+6. Make a copy of the env file:
 
     ```
     cp sample.env .env
     ```
 
-6. Fill in the required environment variables in .env. These variables are: `ALL_PARTICIPANTS`, `GNOSIS_LEDGER_RPC`, `COINGECKO_API_KEY` and `SAFE_CONTRACT_ADDRESS`. You will need to get a [Coingecko](https://www.coingecko.com/). Set `GNOSIS_LEDGER_RPC` to your Tenderly fork Admin RPC.
+7. Fill in the required environment variables in .env. These variables are: `ALL_PARTICIPANTS`, `GNOSIS_LEDGER_RPC`, `COINGECKO_API_KEY` and `SAFE_CONTRACT_ADDRESS`. You will need to get a [Coingecko](https://www.coingecko.com/). Set `GNOSIS_LEDGER_RPC` to your Tenderly fork Admin RPC.
 
 
-### Run the agent
+### Run a single agent
 
-1. Run the agent:
+1. Verify that `ALL_PARTICIPANTS` in `.env` contains only 1 address.
+
+2. Run the agent:
 
     ```
     bash run_agent.sh
     ```
 
-### Run the service
+### Run the service (4 agents)
 
 1. Check that Docker is running:
 
@@ -78,13 +82,15 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
     docker
     ```
 
-2. Run the service:
+2. Verify that `ALL_PARTICIPANTS` in `.env` contains 4 addresses.
+
+3. Run the service:
 
     ```
     bash run_service.sh
     ```
 
-3. Look at the service logs for one of the agents (on another terminal):
+4. Look at the service logs for one of the agents (on another terminal):
 
     ```
     docker logs -f learningservice_abci_0
