@@ -10,3 +10,5 @@ e66dafccf871ac460213be19e7790cbdbe2db6e4:packages/valory/skills/learning_chained
 57255eacc30221cc6fb193cfb8463d1e1718d209:packages/valory/agents/learning_agent/aea-config.yaml:generic-api-key:122
 57255eacc30221cc6fb193cfb8463d1e1718d209:packages/valory/skills/learning_abci/skill.yaml:generic-api-key:73
 57255eacc30221cc6fb193cfb8463d1e1718d209:packages/valory/skills/learning_chained_abci/skill.yaml:generic-api-key:77
+24d4b331a534eac6da53c8b068324e63182d3b15:packages/valory/skills/learning_abci/skill.yaml:generic-api-key:131
+24d4b331a534eac6da53c8b068324e63182d3b15:packages/valory/skills/learning_chained_abci/skill.yaml:generic-api-key:141

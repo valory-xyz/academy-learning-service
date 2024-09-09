@@ -30,6 +30,7 @@ class APICheckPayload(BaseTxPayload):
     """Represent a transaction payload for the APICheckRound."""
 
     price: Optional[float]
+    balance: Optional[float]
 
 
 @dataclass(frozen=True)

@@ -94,6 +94,7 @@ all-linters:
 	tox -e darglint
 	tox -e pylint
 	tox -e mypy
+	tox -e liccheck
 
 .PHONY: fix-abci-app-specs
 fix-abci-app-specs:
