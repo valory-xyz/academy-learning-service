@@ -23,6 +23,7 @@ import json
 from abc import ABC
 from typing import Any, Generator, Optional, Set, Type, cast
 
+from packages.valory.contracts.erc20.contract import ERC20
 from packages.valory.contracts.gnosis_safe.contract import GnosisSafeContract
 from packages.valory.protocols.contract_api import ContractApiMessage
 from packages.valory.protocols.ledger_api import LedgerApiMessage
@@ -89,7 +90,8 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             sender = self.context.agent_address
             price = yield from self.get_token_price()
-            payload = APICheckPayload(sender=sender, price=price)
+            balance = yield from self.get_token_balance()
+            payload = APICheckPayload(sender=sender, price=price, balance=balance)
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
@@ -122,6 +124,40 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
         self.context.logger.info(f"Got token price from Coingecko: {price}")
 
         return price
+
+    def get_token_balance(self) -> Generator[None, None, Optional[float]]:
+        """Get balance"""
+        self.context.logger.info(
+            f"Getting Olas balance for Safe {self.synchronized_data.safe_contract_address}"
+        )
+
+        response_msg = yield from self.get_contract_api_response(
+            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
+            contract_address=self.params.olas_token_address,
+            contract_id=str(ERC20.contract_id),
+            contract_callable="check_balance",
+            account=self.synchronized_data.safe_contract_address,
+            chain_id=GNOSIS_CHAIN_ID,
+        )
+        if response_msg.performative != ContractApiMessage.Performative.RAW_TRANSACTION:
+            self.context.logger.error(
+                f"Error while retrieving the balance: {response_msg}"
+            )
+            return None
+
+        balance = response_msg.raw_transaction.body.get("token", None)
+        if balance is None:
+            self.context.logger.error(
+                f"Error while retrieving the balance:  {response_msg}"
+            )
+            return None
+
+        balance = balance / 10**18
+
+        self.context.logger.info(
+            f"Account {self.synchronized_data.safe_contract_address} has {balance} Olas"
+        )
+        return balance
 
 
 class DecisionMakingBehaviour(
@@ -160,13 +196,21 @@ class DecisionMakingBehaviour(
             self.context.logger.info("Token price is None. Sending the ERROR event...")
             return Event.ERROR.value
 
+        # If we fail to get the token balance, we send the ERROR event
+        token_price = self.synchronized_data.price
+        if not token_price:
+            self.context.logger.info(
+                "Token balance is None. Sending the ERROR event..."
+            )
+            return Event.ERROR.value
+
         # If the timestamp does not end in 0, we send the DONE event
-        now = self.get_sync_timestamp()
+        now = int(self.get_sync_timestamp())
         self.context.logger.info(f"Timestamp is {now}")
 
-        if int(now) % 5 != 0:
+        if now % 5 != 0:
             self.context.logger.info(
-                f"Timestamp [{int(now)}] is not divisible by 5. Sending the DONE event..."
+                f"Timestamp [{now}] is not divisible by 5. Sending the DONE event..."
             )
             return Event.DONE.value
 
