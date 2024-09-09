@@ -49,32 +49,42 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
 
 2. Deploy a [Safe on Gnosis](https://app.safe.global/welcome) (it's free) and set your agent addresses as signers. Set the signature threshold to 3 out of 4.
 
-3. Fund your agents and Safe with a small amount of xDAI, i.e. $0.02 each.
+3. Create a [Tenderly](https://tenderly.co/) account and from your dashboard create a fork of Gnosis chain (virtual testnet).
 
+4. From Tenderly, fund your agents and Safe with a small amount of xDAI, i.e. $0.02 each.
 
-### Run the service
-
-1. Make a copy of the env file:
+5. Make a copy of the env file:
 
     ```
     cp sample.env .env
     ```
 
-2. Fill in the required environment variables in .env. These variables are: `ALL_PARTICIPANTS`, `GNOSIS_LEDGER_RPC`, `COINGECKO_API_KEY` and `SAFE_CONTRACT_ADDRESS`. You will need to get a [Coingecko](https://www.coingecko.com/) free API and a [Tenderly](https://tenderly.co/) fork RPC (or alternatively an actual mainnet RPC if you want to run against the real chain).
+6. Fill in the required environment variables in .env. These variables are: `ALL_PARTICIPANTS`, `GNOSIS_LEDGER_RPC`, `COINGECKO_API_KEY` and `SAFE_CONTRACT_ADDRESS`. You will need to get a [Coingecko](https://www.coingecko.com/). Set `GNOSIS_LEDGER_RPC` to your Tenderly fork Admin RPC.
 
-3. Check that Docker is running:
+
+### Run the agent
+
+1. Run the agent:
+
+    ```
+    bash run_agent.sh
+    ```
+
+### Run the service
+
+1. Check that Docker is running:
 
     ```
     docker
     ```
 
-4. Run the service:
+2. Run the service:
 
     ```
     bash run_service.sh
     ```
 
-5. Look at the service logs (on another terminal):
+3. Look at the service logs for one of the agents (on another terminal):
 
     ```
     docker logs -f learningservice_abci_0
