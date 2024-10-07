@@ -8,11 +8,22 @@ if test -d learning_service; then
   sudo rm -r learning_service
 fi
 
-# Push packages and fetch service
-make clean
+# Remove empty directories to avoid wrong hashes
+find . -empty -type d -delete
 
+# Ensure that third party packages are correctly synced
+make clean
+AUTONOMY_VERSION=v$(autonomy --version | grep -oP '(?<=version\s)\S+')
+AEA_VERSION=v$(aea --version | grep -oP '(?<=version\s)\S+')
+autonomy packages sync --source valory-xyz/open-aea:$AEA_VERSION --source valory-xyz/open-autonomy:$AUTONOMY_VERSION --update-packages
+
+# Ensure hashes are updated
+autonomy packages lock
+
+# Push packages to IPFS
 autonomy push-all
 
+# Fetch the service
 autonomy fetch --local --service valory/learning_service && cd learning_service
 
 # Build the image

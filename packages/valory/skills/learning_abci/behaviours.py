@@ -32,14 +32,18 @@ from packages.valory.skills.abstract_round_abci.behaviours import (
     AbstractRoundBehaviour,
     BaseBehaviour,
 )
-from packages.valory.skills.learning_abci.models import Params, SharedState
+from packages.valory.skills.learning_abci.models import (
+    CoingeckoSpecs,
+    Params,
+    SharedState,
+)
 from packages.valory.skills.learning_abci.payloads import (
-    APICheckPayload,
+    DataPullPayload,
     DecisionMakingPayload,
     TxPreparationPayload,
 )
 from packages.valory.skills.learning_abci.rounds import (
-    APICheckRound,
+    DataPullRound,
     DecisionMakingRound,
     Event,
     LearningAbciApp,
@@ -52,6 +56,7 @@ from packages.valory.skills.transaction_settlement_abci.payload_tools import (
 from packages.valory.skills.transaction_settlement_abci.rounds import TX_HASH_LENGTH
 
 
+# Define constants
 HTTP_OK = 200
 GNOSIS_CHAIN_ID = "gnosis"
 TX_DATA = b"0x"
@@ -61,37 +66,43 @@ TO_ADDRESS_KEY = "to_address"
 
 
 class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-ancestors
-    """Base behaviour for the learning_abci skill."""
-
-    @property
-    def synchronized_data(self) -> SynchronizedData:
-        """Return the synchronized data."""
-        return cast(SynchronizedData, super().synchronized_data)
+    """Base behaviour for the learning_abci behaviours."""
 
     @property
     def params(self) -> Params:
-        """Return the params."""
+        """Return the params. Configs go here"""
         return cast(Params, super().params)
 
     @property
+    def synchronized_data(self) -> SynchronizedData:
+        """Return the synchronized data. This data is common to all agents"""
+        return cast(SynchronizedData, super().synchronized_data)
+
+    @property
     def local_state(self) -> SharedState:
-        """Return the state."""
+        """Return the state of this particular agent."""
         return cast(SharedState, self.context.state)
 
+    @property
+    def coingecko_specs(self) -> CoingeckoSpecs:
+        """Get the Coingecko api specs."""
+        return self.context.coingecko_specs
 
-class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
-    """APICheckBehaviour"""
 
-    matching_round: Type[AbstractRound] = APICheckRound
+class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
+    """This behaviours pulls token prices from API endpoints and reads the native balance of an account"""
+
+    matching_round: Type[AbstractRound] = DataPullRound
 
     def async_act(self) -> Generator:
         """Do the act, supporting asynchronous execution."""
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             sender = self.context.agent_address
-            price = yield from self.get_token_price()
+            price = yield from self.get_token_price_simple()
+            price = yield from self.get_token_price_specs()
             balance = yield from self.get_token_balance()
-            payload = APICheckPayload(sender=sender, price=price, balance=balance)
+            payload = DataPullPayload(sender=sender, price=price, balance=balance)
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
@@ -99,7 +110,7 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
 
         self.set_done()
 
-    def get_token_price(self) -> Generator[None, None, Optional[float]]:
+    def get_token_price_simple(self) -> Generator[None, None, Optional[float]]:
         """Get token price"""
 
         url_template = self.params.coingecko_price_template
@@ -123,6 +134,15 @@ class APICheckBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
 
         self.context.logger.info(f"Got token price from Coingecko: {price}")
 
+        return price
+
+    def get_token_price_specs(self) -> Generator[None, None, Optional[float]]:
+        """Get token price"""
+        specs = self.coingecko_specs.get_spec()
+        raw_response = yield from self.get_http_response(**specs)
+        response = self.coingecko_specs.process_response(raw_response)
+        price = response.get("usd", None)
+        self.context.logger.info(f"Got token price from Coingecko: {price}")
         return price
 
     def get_token_balance(self) -> Generator[None, None, Optional[float]]:
@@ -342,10 +362,10 @@ class TxPreparationBehaviour(
 class LearningRoundBehaviour(AbstractRoundBehaviour):
     """LearningRoundBehaviour"""
 
-    initial_behaviour_cls = APICheckBehaviour
+    initial_behaviour_cls = DataPullBehaviour
     abci_app_cls = LearningAbciApp  # type: ignore
     behaviours: Set[Type[BaseBehaviour]] = [  # type: ignore
-        APICheckBehaviour,
+        DataPullBehaviour,
         DecisionMakingBehaviour,
         TxPreparationBehaviour,
     ]

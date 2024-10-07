@@ -35,7 +35,7 @@ from packages.valory.skills.abstract_round_abci.base import (
     get_name,
 )
 from packages.valory.skills.learning_abci.payloads import (
-    APICheckPayload,
+    DataPullPayload,
     DecisionMakingPayload,
     TxPreparationPayload,
 )
@@ -94,10 +94,10 @@ class SynchronizedData(BaseSynchronizedData):
         return str(self.db.get_strict("tx_submitter"))
 
 
-class APICheckRound(CollectSameUntilThresholdRound):
-    """APICheckRound"""
+class DataPullRound(CollectSameUntilThresholdRound):
+    """DataPullRound"""
 
-    payload_class = APICheckPayload
+    payload_class = DataPullPayload
     synchronized_data_class = SynchronizedData
     done_event = Event.DONE
     no_majority_event = Event.NO_MAJORITY
@@ -160,14 +160,14 @@ class FinishedTxPreparationRound(DegenerateRound):
 class LearningAbciApp(AbciApp[Event]):
     """LearningAbciApp"""
 
-    initial_round_cls: AppState = APICheckRound
+    initial_round_cls: AppState = DataPullRound
     initial_states: Set[AppState] = {
-        APICheckRound,
+        DataPullRound,
     }
     transition_function: AbciAppTransitionFunction = {
-        APICheckRound: {
-            Event.NO_MAJORITY: APICheckRound,
-            Event.ROUND_TIMEOUT: APICheckRound,
+        DataPullRound: {
+            Event.NO_MAJORITY: DataPullRound,
+            Event.ROUND_TIMEOUT: DataPullRound,
             Event.DONE: DecisionMakingRound,
         },
         DecisionMakingRound: {
@@ -192,7 +192,7 @@ class LearningAbciApp(AbciApp[Event]):
     event_to_timeout: EventToTimeout = {}
     cross_period_persisted_keys: FrozenSet[str] = frozenset()
     db_pre_conditions: Dict[AppState, Set[str]] = {
-        APICheckRound: set(),
+        DataPullRound: set(),
     }
     db_post_conditions: Dict[AppState, Set[str]] = {
         FinishedDecisionMakingRound: set(),
