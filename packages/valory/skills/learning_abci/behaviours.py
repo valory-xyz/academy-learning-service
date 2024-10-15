@@ -313,7 +313,7 @@ class DecisionMakingBehaviour(
         block_number = yield from self.get_block_number()
 
         # Get the balance we calculated in the previous round
-        balance = self.synchronized_data.native_balance
+        native_balance = self.synchronized_data.native_balance
 
         # We stored the price using two approaches: synchronized_data and IPFS
         # Similarly, we retrieve using the corresponding ways
@@ -331,23 +331,22 @@ class DecisionMakingBehaviour(
             return Event.ERROR.value
 
         # If we fail to get the token balance, we send the ERROR event
-        if not balance:
+        if not native_balance:
             self.context.logger.info(
-                "Token balance is None. Sending the ERROR event..."
+                "Native balance is None. Sending the ERROR event..."
             )
             return Event.ERROR.value
 
-        # Make a decision based on the timestamp
-        now = int(self.get_sync_timestamp())
-        self.context.logger.info(f"Timestamp is {now}")
+        # Make a decision based on the balance's last number
+        last_number = int(str(native_balance)[-1])
 
-        # If the timestamp is even, we transact
-        if now % 2 == 0:
-            self.context.logger.info("Timestamp is even. Transacting.")
+        # If the number is even, we transact
+        if last_number % 2 == 0:
+            self.context.logger.info("Number is even. Transacting.")
             return Event.TRANSACT.value
 
         # Otherwise we send the DONE event
-        self.context.logger.info("Timestamp is odd. Not transacting.")
+        self.context.logger.info("Number is odd. Not transacting.")
         return Event.DONE.value
 
     def get_block_number(self) -> Generator[None, None, Optional[int]]:
