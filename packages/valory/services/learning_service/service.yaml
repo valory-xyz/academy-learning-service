@@ -7,7 +7,7 @@ license: Apache-2.0
 fingerprint:
   README.md: bafybeid42pdrf6qrohedylj4ijrss236ai6geqgf3he44huowiuf7pl464
 fingerprint_ignore_patterns: []
-agent: valory/learning_agent:0.1.0:bafybeidx4wzetzdpma4sxixt7fbxri6q2zj3jfixr6wd7cuo3i2blgjvxu
+agent: valory/learning_agent:0.1.0:bafybeib3f6bwoiltql6bx74tmjj4rd3j4cqy3hsjsuns6dcs5cm73nk4re
 number_of_agents: 4
 deployment:
   agent:
@@ -92,13 +92,13 @@ extra:
         termination_from_block: ${TERMINATION_FROM_BLOCK:int:34088325}
         coingecko_price_template: ${COINGECKO_PRICE_TEMPLATE:str:https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}}
         coingecko_api_key: ${COINGECKO_API_KEY:str:null}
-        transfer_target_address: ${TRANSFER_TARGET_ADDRESS:str:0x615d3278680337e2D39C3bc5042D959C7938B917}
+        transfer_target_address: ${TRANSFER_TARGET_ADDRESS:str:0x0000000000000000000000000000000000000000}
         olas_token_address: ${OLAS_TOKEN_ADDRESS:str:0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f}
     coingecko_specs:
       args:
         api_id: coingecko
         headers:
-          Accepr: application/json
+          Accept: application/json
         method: GET
         parameters:
           ids: autonolas
@@ -107,7 +107,7 @@ extra:
         response_key: autonolas
         response_type: dict
         retries: 5
-        url: https://api.coingecko.com/api/v3/simple/price?
+        url: https://api.coingecko.com/api/v3/simple/price
 1:
   models:
     benchmark_tool:
@@ -153,13 +153,13 @@ extra:
         termination_from_block: ${TERMINATION_FROM_BLOCK:int:34088325}
         coingecko_price_template: ${COINGECKO_PRICE_TEMPLATE:str:https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}}
         coingecko_api_key: ${COINGECKO_API_KEY:str:null}
-        transfer_target_address: ${TRANSFER_TARGET_ADDRESS:str:0x615d3278680337e2D39C3bc5042D959C7938B917}
+        transfer_target_address: ${TRANSFER_TARGET_ADDRESS:str:0x0000000000000000000000000000000000000000}
         olas_token_address: ${OLAS_TOKEN_ADDRESS:str:0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f}
     coingecko_specs:
       args:
         api_id: coingecko
         headers:
-          Accepr: application/json
+          Accept: application/json
         method: GET
         parameters:
           ids: autonolas
@@ -168,7 +168,7 @@ extra:
         response_key: autonolas
         response_type: dict
         retries: 5
-        url: https://api.coingecko.com/api/v3/simple/price?
+        url: https://api.coingecko.com/api/v3/simple/price
 2:
   models:
     benchmark_tool:
@@ -214,13 +214,13 @@ extra:
         termination_from_block: ${TERMINATION_FROM_BLOCK:int:34088325}
         coingecko_price_template: ${COINGECKO_PRICE_TEMPLATE:str:https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}}
         coingecko_api_key: ${COINGECKO_API_KEY:str:null}
-        transfer_target_address: ${TRANSFER_TARGET_ADDRESS:str:0x615d3278680337e2D39C3bc5042D959C7938B917}
+        transfer_target_address: ${TRANSFER_TARGET_ADDRESS:str:0x0000000000000000000000000000000000000000}
         olas_token_address: ${OLAS_TOKEN_ADDRESS:str:0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f}
     coingecko_specs:
       args:
         api_id: coingecko
         headers:
-          Accepr: application/json
+          Accept: application/json
         method: GET
         parameters:
           ids: autonolas
@@ -229,7 +229,7 @@ extra:
         response_key: autonolas
         response_type: dict
         retries: 5
-        url: https://api.coingecko.com/api/v3/simple/price?
+        url: https://api.coingecko.com/api/v3/simple/price
 3:
   models:
     benchmark_tool:
@@ -275,13 +275,13 @@ extra:
         termination_from_block: ${TERMINATION_FROM_BLOCK:int:34088325}
         coingecko_price_template: ${COINGECKO_PRICE_TEMPLATE:str:https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}}
         coingecko_api_key: ${COINGECKO_API_KEY:str:null}
-        transfer_target_address: ${TRANSFER_TARGET_ADDRESS:str:0x615d3278680337e2D39C3bc5042D959C7938B917}
+        transfer_target_address: ${TRANSFER_TARGET_ADDRESS:str:0x0000000000000000000000000000000000000000}
         olas_token_address: ${OLAS_TOKEN_ADDRESS:str:0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f}
     coingecko_specs:
       args:
         api_id: coingecko
         headers:
-          Accepr: application/json
+          Accept: application/json
         method: GET
         parameters:
           ids: autonolas
@@ -290,7 +290,7 @@ extra:
         response_key: autonolas
         response_type: dict
         retries: 5
-        url: https://api.coingecko.com/api/v3/simple/price?
+        url: https://api.coingecko.com/api/v3/simple/price
 ---
 public_id: valory/ledger:0.19.0
 type: connection

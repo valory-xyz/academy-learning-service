@@ -55,7 +55,7 @@ class SynchronizedData(BaseSynchronizedData):
     """
     Class to represent the synchronized data.
 
-    This data is replicated by the tendermint application.
+    This data is replicated by the tendermint application, so all the agents share the same data.
     """
 
     def _get_deserialized(self, key: str) -> DeserializedCollection:
@@ -69,14 +69,24 @@ class SynchronizedData(BaseSynchronizedData):
         return self.db.get("price", None)
 
     @property
-    def balance(self) -> Optional[float]:
-        """Get the token balance."""
-        return self.db.get("balance", None)
+    def price_ipfs_hash(self) -> Optional[str]:
+        """Get the price_ipfs_hash."""
+        return self.db.get("price_ipfs_hash", None)
 
     @property
-    def participant_to_api_round(self) -> DeserializedCollection:
-        """Get the participants to the price round."""
-        return self._get_deserialized("participant_to_api_round")
+    def native_balance(self) -> Optional[float]:
+        """Get the native balance."""
+        return self.db.get("native_balance", None)
+
+    @property
+    def erc20_balance(self) -> Optional[float]:
+        """Get the erc20 balance."""
+        return self.db.get("erc20_balance", None)
+
+    @property
+    def participant_to_data_round(self) -> DeserializedCollection:
+        """Agent to payload mapping for the DataPullRound."""
+        return self._get_deserialized("participant_to_data_round")
 
     @property
     def most_voted_tx_hash(self) -> Optional[float]:
@@ -101,10 +111,18 @@ class DataPullRound(CollectSameUntilThresholdRound):
     synchronized_data_class = SynchronizedData
     done_event = Event.DONE
     no_majority_event = Event.NO_MAJORITY
-    collection_key = get_name(SynchronizedData.participant_to_api_round)
+
+    # Collection key specifies where in the synchronized data the agento to payload mapping will be stored
+    collection_key = get_name(SynchronizedData.participant_to_data_round)
+
+    # Selection key specifies how to extract all the different objects from each agent's payload
+    # and where to store it in the synchronized data. Notice that the order follows the same order
+    # from the payload class.
     selection_key = (
         get_name(SynchronizedData.price),
-        get_name(SynchronizedData.balance),
+        get_name(SynchronizedData.price_ipfs_hash),
+        get_name(SynchronizedData.native_balance),
+        get_name(SynchronizedData.erc20_balance),
     )
 
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
@@ -116,6 +134,8 @@ class DecisionMakingRound(CollectSameUntilThresholdRound):
     payload_class = DecisionMakingPayload
     synchronized_data_class = SynchronizedData
 
+    # Since we need to execute some actions after consensus, we override the end_block method
+    # instead of just setting the selection and collection keys
     def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Event]]:
         """Process the end of the block."""
 

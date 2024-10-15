@@ -7,18 +7,19 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeiho3lkochqpmes4f235chq26oggmwnol3vjuvhosleoubbjirbwaq
-  behaviours.py: bafybeiaht32mhvjqh2rcsa7s6igf3tvxgtrq7nejlunwbuo4hzkq55hbv4
+  behaviours.py: bafybeic7v3wryvwanu4vlaltxh7rjzaawo6u7lc646rgfint6x5v4ygd6m
   dialogues.py: bafybeifqjbumctlffx2xvpga2kcenezhe47qhksvgmaylyp5ypwqgfar5u
   fsm_specification.yaml: bafybeigbbydxuqephdpatb3fp3sxnvr77bfvvo5hwjimxfpgyl32wupe64
   handlers.py: bafybeigjadr4thz6hfpfx5abezbwnqhbxmachf4efasrn4z2vqhsqgnyvi
-  models.py: bafybeicosqwkm5xi7nj6gv34t644gf7yb52uwbigfeydph525lpizmmxna
-  payloads.py: bafybeicj3ymhvkttcp7vdcd2bkpaebibodyf5hftw4y3ddqqx5medbqzvm
-  rounds.py: bafybeif4fpfk4sn2potqkaox7gt7qj2m5d5q5fwmnocs2y475zv7jrkzzm
+  models.py: bafybeicreffhurci7jzpwvxnlo5z3a2j3vcfgkopg2gtwwxfrncbzk77ra
+  payloads.py: bafybeidc6qqnfvd7qovjatt2i2kbga7pj6epdghlzqxdhzx6b6j6p7ubvm
+  rounds.py: bafybeibcxdou2opzsof4fcnaijfdgzpaaggmucyolhegns3k4zpzvuom2i
 fingerprint_ignore_patterns: []
 connections: []
 contracts:
 - valory/gnosis_safe:0.1.0:bafybeiho6sbfts3zk3mftrngw37d5qnlvkqtnttt3fzexmcwkeevhu4wwi
-- valory/erc20:0.1.0:bafybeiel24epwfr5nsk5xt2dfdimrzhrqchjxdeeh6wpm6nz35w6po6osa
+- valory/erc20:0.1.0:bafybeibk2y6ldylquuikk3cmtk64e2wnjbtuxy5doorzsp4ysx6uwqbdxm
+- valory/multisend:0.1.0:bafybeig5byt5urg2d2bsecufxe5ql7f4mezg3mekfleeh32nmuusx66p4y
 protocols:
 - valory/contract_api:1.0.0:bafybeidgu7o5llh26xp3u3ebq3yluull5lupiyeu6iooi2xyymdrgnzq5i
 - valory/ledger_api:1.0.0:bafybeihdk6psr4guxmbcrc26jr2cbgzpd5aljkqvpwo64bvaz7tdti2oni
@@ -129,12 +130,13 @@ models:
       coingecko_api_key: null
       transfer_target_address: '0x0000000000000000000000000000000000000000'
       olas_token_address: '0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f'
+      multisend_address: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
     class_name: Params
   coingecko_specs:
     args:
       api_id: coingecko
       headers:
-        Accepr: application/json
+        Accept: application/json
       method: GET
       parameters:
         ids: autonolas
@@ -143,7 +145,7 @@ models:
       response_key: autonolas
       response_type: dict
       retries: 5
-      url: https://api.coingecko.com/api/v3/simple/price?
+      url: https://api.coingecko.com/api/v3/simple/price
     class_name: CoingeckoSpecs
   requests:
     args: {}

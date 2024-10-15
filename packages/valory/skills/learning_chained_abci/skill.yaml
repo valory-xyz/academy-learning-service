@@ -22,7 +22,7 @@ skills:
 - valory/registration_abci:0.1.0:bafybeicnth5q4httefsusywx3zrrq4al47owvge72dqf2fziruicq6hqta
 - valory/reset_pause_abci:0.1.0:bafybeievjciqdvxhqxfjd4whqs27h6qbxqzrae7wwj7fpvxlvmtw3x35im
 - valory/termination_abci:0.1.0:bafybeid54buqxipiuduw7b6nnliiwsxajnltseuroad53wukfonpxca2om
-- valory/learning_abci:0.1.0:bafybeibepvsm2qzi7udwx4lrp2zugdpjpfbtw3xlvm77znhb3ii63w6rdy
+- valory/learning_abci:0.1.0:bafybeiccw7sqjxftczyfouy2sh7f2pzheox27pxhwqpptnzetnzeh656vq
 - valory/transaction_settlement_abci:0.1.0:bafybeihq2yenstblmaadzcjousowj5kfn5l7ns5pxweq2gcrsczfyq5wzm
 behaviours:
   main:
@@ -95,7 +95,7 @@ models:
       keeper_timeout: 30.0
       max_attempts: 10
       max_healthcheck: 120
-      multisend_address: '0x0000000000000000000000000000000000000000'
+      multisend_address: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
       termination_sleep: 900
       termination_from_block: 0
       init_fallback_gas: 0
@@ -144,7 +144,7 @@ models:
     args:
       api_id: coingecko
       headers:
-        Accepr: application/json
+        Accept: application/json
       method: GET
       parameters:
         ids: autonolas
@@ -153,7 +153,7 @@ models:
       response_key: autonolas
       response_type: dict
       retries: 5
-      url: https://api.coingecko.com/api/v3/simple/price?
+      url: https://api.coingecko.com/api/v3/simple/price
     class_name: CoingeckoSpecs
   randomness_api:
     args:
