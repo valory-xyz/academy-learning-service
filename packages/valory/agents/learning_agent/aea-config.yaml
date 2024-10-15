@@ -19,7 +19,7 @@ contracts:
 - valory/gnosis_safe_proxy_factory:0.1.0:bafybeihi4cvrnf5ne7t5cxcwix3dbtfjucfjux6zn4wouebjx3ldmrmnpm
 - valory/multisend:0.1.0:bafybeig5byt5urg2d2bsecufxe5ql7f4mezg3mekfleeh32nmuusx66p4y
 - valory/service_registry:0.1.0:bafybeieqgcuxmz4uxvlyb62mfsf33qy4xwa5lrij4vvcmrtcsfkng43oyq
-- valory/erc20:0.1.0:bafybeiel24epwfr5nsk5xt2dfdimrzhrqchjxdeeh6wpm6nz35w6po6osa
+- valory/erc20:0.1.0:bafybeibk2y6ldylquuikk3cmtk64e2wnjbtuxy5doorzsp4ysx6uwqbdxm
 protocols:
 - open_aea/signing:1.0.0:bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi
 - valory/abci:0.1.0:bafybeiaqmp7kocbfdboksayeqhkbrynvlfzsx4uy4x6nohywnmaig4an7u
@@ -32,8 +32,8 @@ protocols:
 skills:
 - valory/abstract_abci:0.1.0:bafybeihu2bcgjk2tqjiq2zhk3uogtfszqn4osvdt7ho3fubdpdj4jgdfjm
 - valory/abstract_round_abci:0.1.0:bafybeibovsktd3uxur45nrcomq5shcn46cgxd5idmhxbmjhg32c5abyqim
-- valory/learning_abci:0.1.0:bafybeiddwdmznotlmqpdpz4jfjaxrls466mwwvodbvthijuo3dvkbvjvmq
-- valory/learning_chained_abci:0.1.0:bafybeifgnpc5ffvhgjehufna25t2zss4yjmzvjza6l667burz2ukmrr5uq
+- valory/learning_abci:0.1.0:bafybeih2g2tlqwh4dmvlqiielp3e4ogys7bqxdebkdz6wmztfetdtmsu3i
+- valory/learning_chained_abci:0.1.0:bafybeichwyiomzdi6ukountryerhae3j53k6at4nk7id2mmkrn26wano6q
 - valory/registration_abci:0.1.0:bafybeicnth5q4httefsusywx3zrrq4al47owvge72dqf2fziruicq6hqta
 - valory/reset_pause_abci:0.1.0:bafybeievjciqdvxhqxfjd4whqs27h6qbxqzrae7wwj7fpvxlvmtw3x35im
 - valory/termination_abci:0.1.0:bafybeid54buqxipiuduw7b6nnliiwsxajnltseuroad53wukfonpxca2om
@@ -99,7 +99,7 @@ public_id: valory/p2p_libp2p_client:0.1.0
 type: connection
 config:
   nodes:
-  - uri: ${str:acn.staging.autonolas.tech:9005}
+  - uri: ${str:acn.autonolas.tech:9005}
     public_key: ${str:02d3a830c9d6ea1ae91936951430dee11f4662f33118b02190693be835359a9d77}
 cert_requests:
 - identifier: acn
@@ -147,7 +147,7 @@ models:
       keeper_timeout: 30.0
       max_attempts: 10
       max_healthcheck: 120
-      multisend_address: ${str:0x0000000000000000000000000000000000000000}
+      multisend_address: ${str:0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761}
       termination_sleep: ${int:900}
       init_fallback_gas: 0
       keeper_allowed_retries: 3
@@ -162,8 +162,8 @@ models:
       service_id: learning
       service_registry_address: ${str:null}
       setup:
-        all_participants: ${list:["0x615d3278680337e2D39C3bc5042D959C7938B917"]}
-        safe_contract_address: ${str:0x5C5b146905c11Ee1fE7260c0338b52DCA9582a13}
+        all_participants: ${list:[]}
+        safe_contract_address: ${str:0x0000000000000000000000000000000000000000}
         consensus_threshold: ${int:null}
       share_tm_config_on_startup: ${bool:false}
       sleep_time: 1
@@ -188,5 +188,19 @@ models:
       coingecko_api_key: ${str:null}
       default_chain_id: ${str:gnosis}
       termination_from_block: ${int:34088325}
-      transfer_target_address: ${str:0x615d3278680337e2D39C3bc5042D959C7938B917}
+      transfer_target_address: ${str:0x0000000000000000000000000000000000000000}
       olas_token_address: ${str:0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f}
+  coingecko_specs:
+    args:
+      api_id: coingecko
+      headers:
+        Accept: application/json
+      method: GET
+      parameters:
+        ids: autonolas
+        vs_currencies: usd
+        x_cg_demo_api_key: ${str:null}
+      response_key: autonolas
+      response_type: dict
+      retries: 5
+      url: https://api.coingecko.com/api/v3/simple/price

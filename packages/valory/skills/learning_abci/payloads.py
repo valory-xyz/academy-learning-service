@@ -26,11 +26,13 @@ from packages.valory.skills.abstract_round_abci.base import BaseTxPayload
 
 
 @dataclass(frozen=True)
-class APICheckPayload(BaseTxPayload):
-    """Represent a transaction payload for the APICheckRound."""
+class DataPullPayload(BaseTxPayload):
+    """Represent a transaction payload for the DataPullRound."""
 
     price: Optional[float]
-    balance: Optional[float]
+    price_ipfs_hash: Optional[str]
+    native_balance: Optional[float]
+    erc20_balance: Optional[float]
 
 
 @dataclass(frozen=True)

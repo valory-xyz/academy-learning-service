@@ -49,11 +49,11 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
 
 2. Prepare a `ethereum_private_key.txt` file containing one of the private keys from `keys.json`. Ensure that there is no newline at the end.
 
-3. Deploy a [Safe on Gnosis](https://app.safe.global/welcome) (it's free) and set your agent addresses as signers. Set the signature threshold to 3 out of 4.
+3. Deploy two [Safes on Gnosis](https://app.safe.global/welcome) (it's free) and set your agent addresses as signers. Set the signature threshold to 1 out of 4 for one of them and and to 3 out of 4 for the other. This way we can use the single-signer one for testing without running all the agents, and leave the other safe for running the whole service.
 
 4. Create a [Tenderly](https://tenderly.co/) account and from your dashboard create a fork of Gnosis chain (virtual testnet).
 
-5. From Tenderly, fund your agents and Safe with a small amount of xDAI, i.e. $0.02 each.
+5. From Tenderly, fund your agents and Safe with some xDAI and OLAS (`0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f`).
 
 6. Make a copy of the env file:
 
@@ -61,10 +61,16 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
     cp sample.env .env
     ```
 
-7. Fill in the required environment variables in .env. These variables are: `ALL_PARTICIPANTS`, `GNOSIS_LEDGER_RPC`, `COINGECKO_API_KEY` and `SAFE_CONTRACT_ADDRESS`. You will need to get a [Coingecko](https://www.coingecko.com/). Set `GNOSIS_LEDGER_RPC` to your Tenderly fork Admin RPC.
+7. Fill in the required environment variables in .env. These variables are:
+- `ALL_PARTICIPANTS`: a list of your agent addresses. This will vary depending on whether you are running a single agent (`run_agent.sh` script) or the whole 4-agent service (`run_service.sh`)
+- `GNOSIS_LEDGER_RPC`: set it to your Tenderly fork Admin RPC.
+- `COINGECKO_API_KEY`: you will need to get a free [Coingecko](https://www.coingecko.com/) API key.
+- `TRANSFER_TARGET_ADDRESS`: any random address to send funds to, can be any of the agents for example.
+- `SAFE_CONTRACT_ADDRESS_SINGLE`: the 1 out of 4 agents Safe address.
+- `SAFE_CONTRACT_ADDRESS`: the 3 out of 4 Safe address.
 
 
-### Run a single agent
+### Run a single agent locally
 
 1. Verify that `ALL_PARTICIPANTS` in `.env` contains only 1 address.
 
@@ -74,15 +80,15 @@ A service to learn about [Olas](https://olas.network/) agents and [Open Autonomy
     bash run_agent.sh
     ```
 
-### Run the service (4 agents)
+### Run the service (4 agents) via Docker Compose deployment
 
-1. Check that Docker is running:
+1. Verify that `ALL_PARTICIPANTS` in `.env` contains 4 address.
+
+2. Check that Docker is running:
 
     ```
     docker
     ```
-
-2. Verify that `ALL_PARTICIPANTS` in `.env` contains 4 addresses.
 
 3. Run the service:
 
