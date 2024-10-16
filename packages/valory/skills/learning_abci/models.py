@@ -21,7 +21,7 @@
 
 from typing import Any
 
-from packages.valory.skills.abstract_round_abci.models import BaseParams
+from packages.valory.skills.abstract_round_abci.models import ApiSpecs, BaseParams
 from packages.valory.skills.abstract_round_abci.models import (
     BenchmarkTool as BaseBenchmarkTool,
 )
@@ -55,4 +55,12 @@ class Params(BaseParams):
             "transfer_target_address", kwargs, str
         )
         self.olas_token_address = self._ensure("olas_token_address", kwargs, str)
+
+        # multisend address is used in other skills, so we cannot pop it using _ensure
+        self.multisend_address = kwargs.get("multisend_address", "")
+
         super().__init__(*args, **kwargs)
+
+
+class CoingeckoSpecs(ApiSpecs):
+    """A model that wraps ApiSpecs for Coingecko API."""
