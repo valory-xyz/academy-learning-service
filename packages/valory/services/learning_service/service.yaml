@@ -7,7 +7,7 @@ license: Apache-2.0
 fingerprint:
   README.md: bafybeid42pdrf6qrohedylj4ijrss236ai6geqgf3he44huowiuf7pl464
 fingerprint_ignore_patterns: []
-agent: valory/learning_agent:0.1.0:bafybeiac6su37yg5w2zsxlxytvtiwxzjywf4i2x3x6eledlrjbk724aptq
+agent: valory/learning_agent:0.1.0:bafybeiatizepnj42umexk3p5rnop67cdshbgrflvnysaagm3t4xqo74kem
 number_of_agents: 4
 deployment:
   agent:
@@ -301,11 +301,26 @@ config:
       chain_id: ${ETHEREUM_LEDGER_CHAIN_ID:int:31337}
       poa_chain: ${ETHEREUM_LEDGER_IS_POA_CHAIN:bool:false}
       default_gas_price_strategy: ${ETHEREUM_LEDGER_PRICING:str:eip1559}
+      gas_price_strategies: &id001
+        gas_station:
+          gas_price_api_key: null
+          gas_price_strategy: fast
+        eip1559:
+          max_gas_fast: 1500
+          fee_history_blocks: 10
+          fee_history_percentile: 5
+          default_priority_fee: ${DEFAULT_PRIORITY_FEE:int:30000000}
+          fallback_estimate:
+            maxFeePerGas: 20000000000
+            maxPriorityFeePerGas: 3000000000
+            baseFee: null
+          priority_fee_increase_boundary: 200
     gnosis:
       address: ${GNOSIS_LEDGER_RPC:str:http://host.docker.internal:8545}
       chain_id: ${GNOSIS_LEDGER_CHAIN_ID:int:42220}
       poa_chain: ${GNOSIS_LEDGER_IS_POA_CHAIN:bool:false}
       default_gas_price_strategy: ${GNOSIS_LEDGER_PRICING:str:eip1559}
+      gas_price_strategies: *id001
 ---
 public_id: valory/p2p_libp2p_client:0.1.0
 type: connection
