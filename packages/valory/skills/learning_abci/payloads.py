@@ -34,6 +34,14 @@ class DataPullPayload(BaseTxPayload):
     native_balance: Optional[float]
     erc20_balance: Optional[float]
 
+@dataclass(frozen=True)
+class NewDataPullPayload(BaseTxPayload):
+    """Represent a transaction payload for the NewDataPullRound."""
+
+    total_holdings: Optional[float]
+    total_value_usd: Optional[float]
+    market_cap_dominance: Optional[float]
+
 
 @dataclass(frozen=True)
 class DecisionMakingPayload(BaseTxPayload):

@@ -43,6 +43,7 @@ from packages.valory.skills.abstract_round_abci.behaviours import (
 )
 from packages.valory.skills.abstract_round_abci.io_.store import SupportedFiletype
 from packages.valory.skills.learning_abci.models import (
+    CoingeckoPublicCompanyHoldingsSpecs,
     CoingeckoSpecs,
     Params,
     SharedState,
@@ -50,6 +51,7 @@ from packages.valory.skills.learning_abci.models import (
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
     DecisionMakingPayload,
+    NewDataPullPayload,
     TxPreparationPayload,
 )
 from packages.valory.skills.learning_abci.rounds import (
@@ -57,6 +59,7 @@ from packages.valory.skills.learning_abci.rounds import (
     DecisionMakingRound,
     Event,
     LearningAbciApp,
+    NewDataPullRound,
     SynchronizedData,
     TxPreparationRound,
 )
@@ -99,6 +102,11 @@ class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-anc
     def coingecko_specs(self) -> CoingeckoSpecs:
         """Get the Coingecko api specs."""
         return self.context.coingecko_specs
+    
+    @property
+    def coingecko_public_company_holdings_specs(self) -> CoingeckoPublicCompanyHoldingsSpecs:
+        """Get the Coingecko public company holdings api specs."""
+        return self.context.coingecko_public_company_holdings_specs
 
     @property
     def metadata_filepath(self) -> str:
@@ -278,6 +286,52 @@ class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
 
         return balance
 
+class NewDataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
+    """This behaviours pulls public companies’ ethereum holdings from API endpoints"""
+
+    matching_round: Type[AbstractRound] = NewDataPullRound
+
+    def async_act(self) -> Generator:
+        """Do the act, supporting asynchronous execution."""
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).local():
+            sender = self.context.agent_address
+
+            # A method to call an API: use ApiSpecs
+            response = yield from self.get_public_company_holdings_specs()
+
+            self.context.logger.info(f"Got public company holding from Coingecko: {response}")
+
+            # Prepare the payload to be shared with other agents
+            # After consensus, all the agents will have the same total_holdings, total_value_usd and market_cap_dominance variables in their synchronized data
+            payload = NewDataPullPayload(
+                sender=sender,
+                total_holdings=response["total_holdings"],
+                total_value_usd=response["total_value_usd"],
+                market_cap_dominance=response["market_cap_dominance"],
+            )
+
+        # Send the payload to all agents and mark the behaviour as done
+        with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
+            yield from self.send_a2a_transaction(payload)
+            yield from self.wait_until_round_end()
+
+        self.set_done()
+    
+    def get_public_company_holdings_specs(self) -> Generator[None, None, Optional[dict]]:
+        """Get company holdings from Coingecko using ApiSpecs"""
+
+        # Get the specs
+        specs = self.coingecko_public_company_holdings_specs.get_spec()
+
+        # Make the call
+        raw_response = yield from self.get_http_response(**specs)
+
+        # Process the response
+        response = self.coingecko_public_company_holdings_specs.process_response(raw_response)
+
+        self.context.logger.info(f"Got public company holding from Coingecko: {response}")
+        return response
 
 class DecisionMakingBehaviour(
     LearningBaseBehaviour
@@ -658,6 +712,7 @@ class LearningRoundBehaviour(AbstractRoundBehaviour):
     abci_app_cls = LearningAbciApp  # type: ignore
     behaviours: Set[Type[BaseBehaviour]] = [  # type: ignore
         DataPullBehaviour,
+        NewDataPullBehaviour,
         DecisionMakingBehaviour,
         TxPreparationBehaviour,
     ]

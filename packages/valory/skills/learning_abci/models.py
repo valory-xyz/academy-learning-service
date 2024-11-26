@@ -64,3 +64,5 @@ class Params(BaseParams):
 
 class CoingeckoSpecs(ApiSpecs):
     """A model that wraps ApiSpecs for Coingecko API."""
+class CoingeckoPublicCompanyHoldingsSpecs(ApiSpecs):
+    """A model that wraps ApiSpecs for Coingecko Public Company Holdings API."""

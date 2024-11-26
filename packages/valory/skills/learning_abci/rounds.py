@@ -37,6 +37,7 @@ from packages.valory.skills.abstract_round_abci.base import (
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
     DecisionMakingPayload,
+    NewDataPullPayload,
     TxPreparationPayload,
 )
 
@@ -82,6 +83,21 @@ class SynchronizedData(BaseSynchronizedData):
     def erc20_balance(self) -> Optional[float]:
         """Get the erc20 balance."""
         return self.db.get("erc20_balance", None)
+    
+    @property
+    def total_holdings(self) -> Optional[float]:
+        """Get the token holdings."""
+        return self.db.get("total_holdings", None)
+
+    @property
+    def total_value_usd(self) -> Optional[str]:
+        """Get the total_value_usd."""
+        return self.db.get("total_value_usd", None)
+
+    @property
+    def market_cap_dominance(self) -> Optional[float]:
+        """Get the market_cap_dominance."""
+        return self.db.get("market_cap_dominance", None)
 
     @property
     def participant_to_data_round(self) -> DeserializedCollection:
@@ -123,6 +139,27 @@ class DataPullRound(CollectSameUntilThresholdRound):
         get_name(SynchronizedData.price_ipfs_hash),
         get_name(SynchronizedData.native_balance),
         get_name(SynchronizedData.erc20_balance),
+    )
+
+    # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
+class NewDataPullRound(CollectSameUntilThresholdRound):
+    """NewDataPullRound"""
+
+    payload_class = NewDataPullPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    no_majority_event = Event.NO_MAJORITY
+
+    # Collection key specifies where in the synchronized data the agento to payload mapping will be stored
+    collection_key = get_name(SynchronizedData.participant_to_data_round)
+
+    # Selection key specifies how to extract all the different objects from each agent's payload
+    # and where to store it in the synchronized data. Notice that the order follows the same order
+    # from the payload class.
+    selection_key = (
+        get_name(SynchronizedData.total_holdings),
+        get_name(SynchronizedData.total_value_usd),
+        get_name(SynchronizedData.market_cap_dominance),
     )
 
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
@@ -188,6 +225,11 @@ class LearningAbciApp(AbciApp[Event]):
         DataPullRound: {
             Event.NO_MAJORITY: DataPullRound,
             Event.ROUND_TIMEOUT: DataPullRound,
+            Event.DONE: NewDataPullRound,
+        },
+        NewDataPullRound: {
+            Event.NO_MAJORITY: NewDataPullRound,
+            Event.ROUND_TIMEOUT: NewDataPullRound,
             Event.DONE: DecisionMakingRound,
         },
         DecisionMakingRound: {
