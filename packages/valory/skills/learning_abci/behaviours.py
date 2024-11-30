@@ -46,15 +46,18 @@ from packages.valory.skills.learning_abci.models import (
     CoingeckoSpecs,
     Params,
     SharedState,
+    Coingeckopricehistorydataspecs,
 )
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
     DecisionMakingPayload,
+    EvaluationPayload,
     TxPreparationPayload,
 )
 from packages.valory.skills.learning_abci.rounds import (
     DataPullRound,
     DecisionMakingRound,
+    EvaluationRound,
     Event,
     LearningAbciApp,
     SynchronizedData,
@@ -99,6 +102,11 @@ class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-anc
     def coingecko_specs(self) -> CoingeckoSpecs:
         """Get the Coingecko api specs."""
         return self.context.coingecko_specs
+    
+    @property
+    def coingecko_pricehistorydata_specs(self) -> Coingeckopricehistorydataspecs:
+        """Get the Coingecko api specs."""
+        return self.context.coingecko_pricehistorydata_specs
 
     @property
     def metadata_filepath(self) -> str:
@@ -278,7 +286,6 @@ class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
 
         return balance
 
-
 class DecisionMakingBehaviour(
     LearningBaseBehaviour
 ):  # pylint: disable=too-many-ancestors
@@ -383,6 +390,56 @@ class DecisionMakingBehaviour(
         )
         self.context.logger.error(f"Got price from IPFS: {price}")
         return price
+
+class EvaluationBehaviour(DataPullBehaviour,LearningBaseBehaviour):
+    """Behaviour to handle the evaluation of current vs historical prices."""
+
+    matching_round: Type[AbstractRound] = EvaluationRound
+
+    def async_act(self) -> Generator:
+        """Perform the evaluation logic."""
+        with self.context.benchmark_tool.measure(self.behaviour_id).local():
+            # Fetch the current token price using the specified method
+            current_price = yield from self.get_token_price_specs()
+
+            # Continue with existing logic
+            historical_data = yield from self.get_historical_price_data()
+            self.context.logger.error(f"Got data from ApiSpecs method: {historical_data}")
+    
+            if not historical_data:
+                return self.synchronized_data, Event.ERROR
+    
+            average_historical_price = sum(historical_data) / len(historical_data)
+    
+            if current_price > average_historical_price:
+                self.context.logger.info("Current price is higher than the average of last day.")
+            elif current_price < average_historical_price:
+                self.context.logger.info("Current price is lower than the average of last day.")
+            else:
+                self.context.logger.info("Current price is the same as the average of last day.")
+
+            payload = EvaluationPayload(
+                sender=self.context.agent_address,
+                historical_prices=historical_data
+            )
+
+        # Send the payload to all agents and mark the behaviour as done
+        with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
+            yield from self.send_a2a_transaction(payload)
+            yield from self.wait_until_round_end()
+
+        self.set_done()
+
+    def get_historical_price_data(self) -> Generator[None, None, list[float]]:
+        """Fetch historical price data from the Coingecko API."""
+        specs = self.coingecko_pricehistorydata_specs.get_spec()
+        response = yield from self.get_http_response(**specs)
+        historical_data = self.coingecko_pricehistorydata_specs.process_response(response)
+
+        prices = [price[1] for price in historical_data]
+        
+        return prices  # Assuming prices is a list of floats
+  
 
 
 class TxPreparationBehaviour(
@@ -659,5 +716,6 @@ class LearningRoundBehaviour(AbstractRoundBehaviour):
     behaviours: Set[Type[BaseBehaviour]] = [  # type: ignore
         DataPullBehaviour,
         DecisionMakingBehaviour,
+        EvaluationBehaviour,
         TxPreparationBehaviour,
     ]

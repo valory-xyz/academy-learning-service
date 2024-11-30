@@ -41,6 +41,12 @@ class DecisionMakingPayload(BaseTxPayload):
 
     event: str
 
+@dataclass(frozen=True)
+class EvaluationPayload(BaseTxPayload):
+    """Payload for the EvaluationRound."""
+    
+    historical_prices: list[float]
+
 
 @dataclass(frozen=True)
 class TxPreparationPayload(BaseTxPayload):

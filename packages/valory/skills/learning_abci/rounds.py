@@ -37,6 +37,7 @@ from packages.valory.skills.abstract_round_abci.base import (
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
     DecisionMakingPayload,
+    EvaluationPayload,
     TxPreparationPayload,
 )
 
@@ -152,6 +153,34 @@ class DecisionMakingRound(CollectSameUntilThresholdRound):
 
     # Event.DONE, Event.ERROR, Event.TRANSACT, Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
+class EvaluationRound(CollectSameUntilThresholdRound):
+    """
+    EvaluationRound is designed to compare current and historical prices, an essential step in scenarios
+    where decisions are based on market trends. This round involves agents reaching a consensus on the 
+    current price and comparing it to previously synchronized historical prices to assess market conditions.
+    """
+
+    payload_class = EvaluationPayload  
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    error_event = Event.ERROR
+    no_majority_event = Event.NO_MAJORITY
+
+    def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Event]]:
+        """
+        This method is called at the end of the round to finalize the operations based on the data collected.
+        Since this is a simplified example, it automatically concludes the round by returning the synchronized
+        data along with a 'DONE' event indicating the round has completed successfully without errors or 
+        the inability to reach a majority.
+        
+        Returns:
+            Optional[Tuple[BaseSynchronizedData, Event]]: Returns a tuple containing the current state of 
+            synchronized data along with the 'DONE' event to signal the successful end of the round.
+        """
+    
+        return self.synchronized_data, Event.DONE
+
+
 
 class TxPreparationRound(CollectSameUntilThresholdRound):
     """TxPreparationRound"""
@@ -195,7 +224,13 @@ class LearningAbciApp(AbciApp[Event]):
             Event.ROUND_TIMEOUT: DecisionMakingRound,
             Event.DONE: FinishedDecisionMakingRound,
             Event.ERROR: FinishedDecisionMakingRound,
-            Event.TRANSACT: TxPreparationRound,
+            Event.TRANSACT: EvaluationRound,
+        },
+        EvaluationRound: {
+            Event.NO_MAJORITY: EvaluationRound,
+            Event.ROUND_TIMEOUT: EvaluationRound,
+            Event.DONE: TxPreparationRound,
+            Event.ERROR: FinishedDecisionMakingRound,
         },
         TxPreparationRound: {
             Event.NO_MAJORITY: TxPreparationRound,
