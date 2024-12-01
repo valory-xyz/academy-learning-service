@@ -35,6 +35,7 @@ from packages.valory.skills.abstract_round_abci.base import (
     get_name,
 )
 from packages.valory.skills.learning_abci.payloads import (
+    ConditionalNativeTransferPayload,
     DataPullPayload,
     DecisionMakingPayload,
     EvaluationPayload,
@@ -191,6 +192,24 @@ class EvaluationRound(CollectSameUntilThresholdRound):
         get_name(SynchronizedData.comparison_data),
     )
 
+class ConditionalNativeTransferRound(CollectSameUntilThresholdRound):
+    """Defines the round behavior for executing a conditional native transfer with a consensus mechanism.
+
+    This round aims to achieve consensus on a transaction hash before proceeding with the actual transaction.
+    """
+
+    payload_class = ConditionalNativeTransferPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.TRANSACT
+    no_majority_event = Event.NO_MAJORITY
+    collection_key = get_name(SynchronizedData.participant_to_tx_round)
+    selection_key = (
+        get_name(SynchronizedData.tx_submitter),
+        get_name(SynchronizedData.most_voted_tx_hash),
+    )
+
+    # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
+
 
 class TxPreparationRound(CollectSameUntilThresholdRound):
     """TxPreparationRound"""
@@ -239,8 +258,15 @@ class LearningAbciApp(AbciApp[Event]):
         EvaluationRound: {
             Event.NO_MAJORITY: EvaluationRound,
             Event.ROUND_TIMEOUT: EvaluationRound,
+            Event.DONE: ConditionalNativeTransferRound,
+            Event.ERROR: FinishedDecisionMakingRound,
+        },
+        ConditionalNativeTransferRound: {
+            Event.NO_MAJORITY: ConditionalNativeTransferRound,
+            Event.ROUND_TIMEOUT: ConditionalNativeTransferRound,
             Event.DONE: TxPreparationRound,
             Event.ERROR: FinishedDecisionMakingRound,
+            Event.TRANSACT: FinishedTxPreparationRound,
         },
         TxPreparationRound: {
             Event.NO_MAJORITY: TxPreparationRound,

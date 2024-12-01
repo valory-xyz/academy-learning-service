@@ -50,6 +50,13 @@ class EvaluationPayload(BaseTxPayload):
     comparison_data: bool = field(default=False)
 
 @dataclass(frozen=True)
+class ConditionalNativeTransferPayload(BaseTxPayload):
+    """Represent a transaction payload for the ConditionalNativeTransferPayload."""
+
+    tx_submitter: Optional[str] = None
+    tx_hash: Optional[str] = None
+
+@dataclass(frozen=True)
 class TxPreparationPayload(BaseTxPayload):
     """Represent a transaction payload for the TxPreparationRound."""
 
