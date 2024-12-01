@@ -90,12 +90,12 @@ class SynchronizedData(BaseSynchronizedData):
         return self._get_deserialized("participant_to_data_round")
     
     @property
-    def historical_data_ipfshash(self) -> Optional[str]:
+    def historical_data_ipfs_hash(self) -> Optional[str]:
         """Get the IPFS hash of historical data."""
-        return self.db.get("historical_data_ipfshash", None)
+        return self.db.get("historical_data_ipfs_hash", None)
     
     @property
-    def comparison_data(self) -> Optional[bool]:
+    def comparison_data(self) -> bool:
         """Get the comparison result of current vs. historical prices."""
         return self.db.get("comparison_data", None)
     
@@ -187,24 +187,9 @@ class EvaluationRound(CollectSameUntilThresholdRound):
     
     # Selection key should map directly to the payload data correctly
     selection_key = (
-        get_name(SynchronizedData.historical_data_ipfshash),
+        get_name(SynchronizedData.historical_data_ipfs_hash),
         get_name(SynchronizedData.comparison_data),
     )
-
-    def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Event]]:
-        """
-        This method is called at the end of the round to finalize the operations based on the data collected.
-        Since this is a simplified example, it automatically concludes the round by returning the synchronized
-        data along with a 'DONE' event indicating the round has completed successfully without errors or 
-        the inability to reach a majority.
-        
-        Returns:
-            Optional[Tuple[BaseSynchronizedData, Event]]: Returns a tuple containing the current state of 
-            synchronized data along with the 'DONE' event to signal the successful end of the round.
-        """
-        print("self.synchronized_data",self.synchronized_data)
-        return self.synchronized_data, Event.DONE
-
 
 
 class TxPreparationRound(CollectSameUntilThresholdRound):

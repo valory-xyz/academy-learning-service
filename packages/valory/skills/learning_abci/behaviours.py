@@ -419,11 +419,11 @@ class EvaluationBehaviour(DataPullBehaviour,LearningBaseBehaviour):
                 self.context.logger.info(f"Price comparison result: {comparison_result}")
 
                 historical_data_ipfs_hash = yield from self.send_historical_data_to_ipfs(historical_data)
-                self.context.logger.info(f"Historical data IPFS hash: {type(historical_data_ipfs_hash)}")
+                self.context.logger.info(f"Historical data IPFS hash: {historical_data_ipfs_hash}")
 
                 payload = EvaluationPayload(
                     sender=self.context.agent_address,
-                    historical_data_ipfshash=historical_data_ipfs_hash,
+                    historical_data_ipfs_hash=historical_data_ipfs_hash,
                     comparison_data=comparison_result,
                 )
                 self.context.logger.info("EvaluationPayload prepared and being sent.")
@@ -439,7 +439,7 @@ class EvaluationBehaviour(DataPullBehaviour,LearningBaseBehaviour):
             self.context.logger.error(f"Error in EvaluationBehaviour: {str(e)}")
             raise
     
-    def compare_prices(self, current, historical_average):
+    def compare_prices(self, current, historical_average) -> str:
         """Log comparison of current price to historical average."""
         if current > historical_average:
             self.context.logger.info("Current price is higher than the average of last day.")
@@ -471,7 +471,6 @@ class EvaluationBehaviour(DataPullBehaviour,LearningBaseBehaviour):
             self.context.logger.error(f"Exception in fetching historical data: {str(e)}")
             return []
 
-    
     def send_historical_data_to_ipfs(self, historical_data) -> Generator[None, None, Optional[str]]:
         """Store the historical price data in IPFS."""
         data = {"historical_prices": historical_data}
@@ -482,9 +481,6 @@ class EvaluationBehaviour(DataPullBehaviour,LearningBaseBehaviour):
             f"Historical price data stored in IPFS: https://gateway.autonolas.tech/ipfs/{historical_data_ipfs_hash}"
         )
         return historical_data_ipfs_hash
-
-  
-
 
 class TxPreparationBehaviour(
     LearningBaseBehaviour
@@ -501,6 +497,7 @@ class TxPreparationBehaviour(
 
             # Get the transaction hash
             tx_hash = yield from self.get_tx_hash()
+            yield from self.get_historical_data_from_ipfs()
 
             payload = TxPreparationPayload(
                 sender=sender, tx_submitter=self.auto_behaviour_id(), tx_hash=tx_hash
@@ -514,12 +511,11 @@ class TxPreparationBehaviour(
     
     def get_historical_data_from_ipfs(self) -> Generator[None, None, Optional[dict]]:
         """Load the historical data from IPFS"""
-        ipfs_hash = self.synchronized_data.historical_data_ipfshash
+        ipfs_hash = self.synchronized_data.historical_data_ipfs_hash
         data = yield from self.get_from_ipfs(
             ipfs_hash=ipfs_hash, filetype=SupportedFiletype.JSON
         )
         self.context.logger.error(f"Got historical data from IPFS: {data}")
-        return data
 
     def get_tx_hash(self) -> Generator[None, None, Optional[str]]:
         """Get the transaction hash"""
