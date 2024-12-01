@@ -90,11 +90,6 @@ class SynchronizedData(BaseSynchronizedData):
         return self._get_deserialized("participant_to_data_round")
     
     @property
-    def historical_data_ipfs_hash(self) -> Optional[str]:
-        """Get the IPFS hash of historical data."""
-        return self.db.get("historical_data_ipfs_hash", None)
-    
-    @property
     def comparison_data(self) -> bool:
         """Get the comparison result of current vs. historical prices."""
         return self.db.get("comparison_data", None)
@@ -187,7 +182,6 @@ class EvaluationRound(CollectSameUntilThresholdRound):
     
     # Selection key should map directly to the payload data correctly
     selection_key = (
-        get_name(SynchronizedData.historical_data_ipfs_hash),
         get_name(SynchronizedData.comparison_data),
     )
 

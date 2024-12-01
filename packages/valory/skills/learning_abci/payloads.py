@@ -46,7 +46,6 @@ class DecisionMakingPayload(BaseTxPayload):
 class EvaluationPayload(BaseTxPayload):
     """Represent a transaction payload for the EvaluationRound."""
 
-    historical_data_ipfs_hash: Optional[str] = field(default=None)
     comparison_data: bool = field(default=False)
 
 @dataclass(frozen=True)
