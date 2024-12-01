@@ -393,52 +393,96 @@ class DecisionMakingBehaviour(
 
 class EvaluationBehaviour(DataPullBehaviour,LearningBaseBehaviour):
     """Behaviour to handle the evaluation of current vs historical prices."""
-
+    
     matching_round: Type[AbstractRound] = EvaluationRound
-
+    
     def async_act(self) -> Generator:
         """Perform the evaluation logic."""
-        with self.context.benchmark_tool.measure(self.behaviour_id).local():
-            # Fetch the current token price using the specified method
-            current_price = yield from self.get_token_price_specs()
+        try:
+            with self.context.benchmark_tool.measure(self.behaviour_id).local():
+                self.context.logger.debug("Starting EvaluationBehaviour logic")
+                
+                current_price = yield from self.get_token_price_specs()
+                self.context.logger.info(f"Current price fetched: {current_price}")
 
-            # Continue with existing logic
-            historical_data = yield from self.get_historical_price_data()
-            self.context.logger.error(f"Got data from ApiSpecs method: {historical_data}")
+                historical_data = yield from self.get_historical_price_data()
+                self.context.logger.info(f"Historical data fetched: {historical_data}")
+                
+                if not historical_data:
+                    self.context.logger.error("No historical data available.")
+                    return self.synchronized_data, Event.ERROR
+
+                average_historical_price = sum(historical_data) / len(historical_data)
+                self.context.logger.info(f"Average historical price computed: {average_historical_price}")
+
+                comparison_result = self.compare_prices(current_price, average_historical_price)
+                self.context.logger.info(f"Price comparison result: {comparison_result}")
+
+                historical_data_ipfs_hash = yield from self.send_historical_data_to_ipfs(historical_data)
+                self.context.logger.info(f"Historical data IPFS hash: {type(historical_data_ipfs_hash)}")
+
+                payload = EvaluationPayload(
+                    sender=self.context.agent_address,
+                    historical_data_ipfshash=historical_data_ipfs_hash,
+                    comparison_data=comparison_result,
+                )
+                self.context.logger.info("EvaluationPayload prepared and being sent.")
+
+            with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
+                yield from self.send_a2a_transaction(payload)
+                yield from self.wait_until_round_end()
+                self.context.logger.info("EvaluationBehaviour completed.")
+
+            self.set_done()
+
+        except Exception as e:
+            self.context.logger.error(f"Error in EvaluationBehaviour: {str(e)}")
+            raise
     
-            if not historical_data:
-                return self.synchronized_data, Event.ERROR
-    
-            average_historical_price = sum(historical_data) / len(historical_data)
-    
-            if current_price > average_historical_price:
-                self.context.logger.info("Current price is higher than the average of last day.")
-            elif current_price < average_historical_price:
-                self.context.logger.info("Current price is lower than the average of last day.")
-            else:
-                self.context.logger.info("Current price is the same as the average of last day.")
-
-            payload = EvaluationPayload(
-                sender=self.context.agent_address,
-                historical_prices=historical_data
-            )
-
-        # Send the payload to all agents and mark the behaviour as done
-        with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
-            yield from self.send_a2a_transaction(payload)
-            yield from self.wait_until_round_end()
-
-        self.set_done()
+    def compare_prices(self, current, historical_average):
+        """Log comparison of current price to historical average."""
+        if current > historical_average:
+            self.context.logger.info("Current price is higher than the average of last day.")
+        elif current < historical_average:
+            self.context.logger.info("Current price is lower than the average of last day.")
+        else:
+            self.context.logger.info("Current price is the same as the average of last day.")
+        return current > historical_average
 
     def get_historical_price_data(self) -> Generator[None, None, list[float]]:
         """Fetch historical price data from the Coingecko API."""
-        specs = self.coingecko_pricehistorydata_specs.get_spec()
-        response = yield from self.get_http_response(**specs)
-        historical_data = self.coingecko_pricehistorydata_specs.process_response(response)
+        try:
+            self.context.logger.debug("Fetching historical price data.")
+            specs = self.coingecko_pricehistorydata_specs.get_spec()
+            response = yield from self.get_http_response(**specs)
+            if response.status_code != HTTP_OK:
+                self.context.logger.error(f"Failed to fetch historical data: {response.body}")
+                return []
+    
+            historical_data = self.coingecko_pricehistorydata_specs.process_response(response)
+            if historical_data is None:
+                self.context.logger.error("No historical data returned from processing.")
+                return []
+    
+            prices = [price[1] for price in historical_data]
+            self.context.logger.info(f"Historical prices fetched: {prices}")
+            return prices  # Assuming prices is a list of floats
+        except Exception as e:
+            self.context.logger.error(f"Exception in fetching historical data: {str(e)}")
+            return []
 
-        prices = [price[1] for price in historical_data]
-        
-        return prices  # Assuming prices is a list of floats
+    
+    def send_historical_data_to_ipfs(self, historical_data) -> Generator[None, None, Optional[str]]:
+        """Store the historical price data in IPFS."""
+        data = {"historical_prices": historical_data}
+        historical_data_ipfs_hash = yield from self.send_to_ipfs(
+            filename=self.metadata_filepath, obj=data, filetype=SupportedFiletype.JSON
+        )
+        self.context.logger.info(
+            f"Historical price data stored in IPFS: https://gateway.autonolas.tech/ipfs/{historical_data_ipfs_hash}"
+        )
+        return historical_data_ipfs_hash
+
   
 
 
@@ -467,6 +511,15 @@ class TxPreparationBehaviour(
             yield from self.wait_until_round_end()
 
         self.set_done()
+    
+    def get_historical_data_from_ipfs(self) -> Generator[None, None, Optional[dict]]:
+        """Load the historical data from IPFS"""
+        ipfs_hash = self.synchronized_data.historical_data_ipfshash
+        data = yield from self.get_from_ipfs(
+            ipfs_hash=ipfs_hash, filetype=SupportedFiletype.JSON
+        )
+        self.context.logger.error(f"Got historical data from IPFS: {data}")
+        return data
 
     def get_tx_hash(self) -> Generator[None, None, Optional[str]]:
         """Get the transaction hash"""

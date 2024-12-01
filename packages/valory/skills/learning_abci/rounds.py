@@ -88,6 +88,22 @@ class SynchronizedData(BaseSynchronizedData):
     def participant_to_data_round(self) -> DeserializedCollection:
         """Agent to payload mapping for the DataPullRound."""
         return self._get_deserialized("participant_to_data_round")
+    
+    @property
+    def historical_data_ipfshash(self) -> Optional[str]:
+        """Get the IPFS hash of historical data."""
+        return self.db.get("historical_data_ipfshash", None)
+    
+    @property
+    def comparison_data(self) -> Optional[bool]:
+        """Get the comparison result of current vs. historical prices."""
+        return self.db.get("comparison_data", None)
+    
+    @property
+    def participant_to_evaluation_round(self) -> DeserializedCollection:
+        """Agent to payload mapping for the DataPullRound."""
+        return self._get_deserialized("participant_to_evaluation_round")
+    
 
     @property
     def most_voted_tx_hash(self) -> Optional[float]:
@@ -166,6 +182,15 @@ class EvaluationRound(CollectSameUntilThresholdRound):
     error_event = Event.ERROR
     no_majority_event = Event.NO_MAJORITY
 
+    # Adjust the collection key to use the appropriate collection for this round
+    collection_key = get_name(SynchronizedData.participant_to_evaluation_round)  # Adjusted
+    
+    # Selection key should map directly to the payload data correctly
+    selection_key = (
+        get_name(SynchronizedData.historical_data_ipfshash),
+        get_name(SynchronizedData.comparison_data),
+    )
+
     def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Event]]:
         """
         This method is called at the end of the round to finalize the operations based on the data collected.
@@ -177,7 +202,7 @@ class EvaluationRound(CollectSameUntilThresholdRound):
             Optional[Tuple[BaseSynchronizedData, Event]]: Returns a tuple containing the current state of 
             synchronized data along with the 'DONE' event to signal the successful end of the round.
         """
-    
+        print("self.synchronized_data",self.synchronized_data)
         return self.synchronized_data, Event.DONE
 
 

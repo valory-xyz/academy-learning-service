@@ -41,12 +41,12 @@ class DecisionMakingPayload(BaseTxPayload):
 
     event: str
 
-@dataclass(frozen=True)
+
 class EvaluationPayload(BaseTxPayload):
     """Payload for the EvaluationRound."""
-    
-    historical_prices: list[float]
 
+    historical_data_ipfshash:Optional[str]
+    comparison_data:Optional[bool]
 
 @dataclass(frozen=True)
 class TxPreparationPayload(BaseTxPayload):
