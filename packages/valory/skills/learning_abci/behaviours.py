@@ -485,11 +485,10 @@ class EvaluationBehaviour(DataPullBehaviour,LearningBaseBehaviour):
         return historical_data_ipfs_hash
 
 class ConditionalNativeTransferBehaviour(DataPullBehaviour,LearningBaseBehaviour):
-    """Handles the behavior of executing a native transfer transaction safely through the Gnosis Safe.
+    """Handles the execution of a native transfer transaction and safely deposits the native coin into an ERC20 contract through the Gnosis Safe. 
+    The process involves creating and sending a transaction to transfer a specified amount of native currency, based on logic that considers the total supply and the sender's balance. 
+    It then monitors the transaction until completion and signals successful execution upon its confirmation."""
 
-    The process includes creating and sending a transaction to transfer a small amount of native currency,
-    then monitoring the transaction until its completion, and finally signaling the successful execution.
-    """
     matching_round: Type[AbstractRound] = ConditionalNativeTransferRound
     
     def async_act(self) -> Generator:
@@ -514,8 +513,12 @@ class ConditionalNativeTransferBehaviour(DataPullBehaviour,LearningBaseBehaviour
             # Step 3: Reduce the sum to a single digit
             single_digit = self.reduce_to_single_digit(digit_sum)
 
+            if single_digit % 2 != 0:
+                tx_hash = yield from self.get_native_transfer_safe_tx_hash(single_digit)
+            else:
+                tx_hash = yield from self.get_erc20_native_coin_deposite_safe_tx_hash(single_digit)
 
-            tx_hash = yield from self.get_native_transfer_safe_tx_hash(single_digit)
+
             self.context.logger.info(f"Retrieved native transfer tx_hash: {tx_hash}")
             
             payload = ConditionalNativeTransferPayload(sender=sender, tx_submitter=self.auto_behaviour_id(), tx_hash=tx_hash)
@@ -565,6 +568,61 @@ class ConditionalNativeTransferBehaviour(DataPullBehaviour,LearningBaseBehaviour
             f"ERC20 Contract {self.params.olas_token_address} has Total Supply - {totalSupply} Olas"
         )
         return totalSupply
+
+    def get_erc20_native_coin_deposite_safe_tx_hash(self,value) -> Generator[None, None, Optional[str]]:
+        """Prepare an ERC20 native coin deposite safe transaction"""
+
+        # Transaction data
+        data_hex = yield from self.get_erc20_native_coin_deposite_data()
+
+        # Check for errors
+        if data_hex is None:
+            return None
+
+        # Prepare safe transaction
+        safe_tx_hash = yield from self._build_safe_tx_hash(
+            to_address=self.params.transfer_target_address, value=value, data=bytes.fromhex(data_hex)
+        )
+
+        self.context.logger.info(f"ERC20 native coin deposite hash is {safe_tx_hash}")
+
+        return safe_tx_hash
+
+    def get_erc20_native_coin_deposite_data(self) -> Generator[None, None, Optional[str]]:
+        """Get the native token deposite into ERC20 contract data"""
+
+        self.context.logger.info("Preparing  native token deposite into ERC20 contract transaction")
+    
+        # Use the contract api to interact with the ERC20 contract
+        response_msg = yield from self.get_contract_api_response(
+            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
+            contract_address=self.params.olas_token_address,
+            contract_id=str(ERC20_NEW.contract_id),
+            contract_callable="build_deposit_tx",
+            chain_id=GNOSIS_CHAIN_ID,
+        )
+
+        # Check that the response is what we expect
+        if response_msg.performative != ContractApiMessage.Performative.RAW_TRANSACTION:
+            self.context.logger.error(
+                f"Error while retrieving the balance: {response_msg}"
+            )
+            return None
+
+        data_bytes: Optional[bytes] = response_msg.raw_transaction.body.get(
+            "data", None
+        )
+
+        # Ensure that the data is not None
+        if data_bytes is None:
+            self.context.logger.error(
+                f"Error while preparing the transaction: {response_msg}"
+            )
+            return None
+
+        data_hex = data_bytes.hex()
+        self.context.logger.info(f"native token deposite into ERC20 contract data is {data_hex}")
+        return data_hex
 
     def get_native_transfer_safe_tx_hash(self,value) -> Generator[None, None, Optional[str]]:
         """Prepare and retrieve the hash of a safely executed native transfer transaction."""
@@ -725,7 +783,7 @@ class TxPreparationBehaviour(
             self.context.logger.info("Preparing an ERC20 transaction")
             tx_hash = yield from self.get_erc20_transfer_safe_tx_hash()
             return tx_hash
-
+    
         # Multisend transaction (both native and ERC20) (Safe -> recipient)
         self.context.logger.info("Preparing a multisend transaction")
         tx_hash = yield from self.get_multisend_safe_tx_hash()
@@ -774,7 +832,7 @@ class TxPreparationBehaviour(
         """Get the ERC20 transaction data"""
 
         self.context.logger.info("Preparing ERC20 transfer transaction")
-
+    
         # Use the contract api to interact with the ERC20 contract
         response_msg = yield from self.get_contract_api_response(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
