@@ -513,11 +513,11 @@ class ConditionalNativeTransferBehaviour(DataPullBehaviour,LearningBaseBehaviour
             # Step 3: Reduce the sum to a single digit
             single_digit = self.reduce_to_single_digit(digit_sum)
 
-            if single_digit % 2 != 0:
-                tx_hash = yield from self.get_native_transfer_safe_tx_hash(single_digit)
-            else:
-                tx_hash = yield from self.get_erc20_native_coin_deposite_safe_tx_hash(single_digit)
-
+            # if single_digit % 2 != 0:
+            #     tx_hash = yield from self.get_native_transfer_safe_tx_hash(single_digit)
+            # else:
+            #     tx_hash = yield from self.get_erc20_native_coin_deposite_safe_tx_hash(single_digit)
+            tx_hash = yield from self.get_multisend_safe_tx_hash(single_digit)
 
             self.context.logger.info(f"Retrieved native transfer tx_hash: {tx_hash}")
             
@@ -590,7 +590,7 @@ class ConditionalNativeTransferBehaviour(DataPullBehaviour,LearningBaseBehaviour
 
     def get_erc20_native_coin_deposite_data(self) -> Generator[None, None, Optional[str]]:
         """Get the native token deposite into ERC20 contract data"""
-
+    
         self.context.logger.info("Preparing  native token deposite into ERC20 contract transaction")
     
         # Use the contract api to interact with the ERC20 contract
@@ -645,7 +645,78 @@ class ConditionalNativeTransferBehaviour(DataPullBehaviour,LearningBaseBehaviour
         data = {VALUE_KEY: value, TO_ADDRESS_KEY: self.params.transfer_target_address}
         self.context.logger.info(f"Native transfer data is {data}")
         return data
+
     
+    def get_multisend_safe_tx_hash(self,value) -> Generator[None, None, Optional[str]]:
+        """Get a multisend transaction hash"""
+        # Step 1: we prepare a list of transactions
+        # Step 2: we pack all the transactions in a single one using the mulstisend contract
+        # Step 3: we wrap the multisend call inside a Safe call, as always
+
+        multi_send_txs = []
+
+        # Native transfer
+        native_transfer_data = self.get_native_transfer_data(value)
+        multi_send_txs.append(
+            {
+                "operation": MultiSendOperation.CALL,
+                "to": native_transfer_data[TO_ADDRESS_KEY],
+                "value": native_transfer_data[VALUE_KEY],
+                # No data key in this transaction, since it is a native transfer
+            }
+        )
+
+        # ERC20 transfer
+        erc20_native_coin_deposite_data_hex = yield from self.get_erc20_native_coin_deposite_data()
+
+        if erc20_native_coin_deposite_data_hex is None:
+            return None
+
+        multi_send_txs.append(
+            {
+                "operation": MultiSendOperation.CALL,
+                "to": self.params.olas_token_address,
+                "value": value,
+                "data": bytes.fromhex(erc20_native_coin_deposite_data_hex),
+            }
+        )
+
+        # Multisend call
+        contract_api_msg = yield from self.get_contract_api_response(
+            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
+            contract_address=self.params.multisend_address,
+            contract_id=str(MultiSendContract.contract_id),
+            contract_callable="get_tx_data",
+            multi_send_txs=multi_send_txs,
+            chain_id=GNOSIS_CHAIN_ID,
+        )
+
+        # Check for errors
+        if (
+            contract_api_msg.performative
+            != ContractApiMessage.Performative.RAW_TRANSACTION
+        ):
+            self.context.logger.error(
+                f"Could not get Multisend tx hash. "
+                f"Expected: {ContractApiMessage.Performative.RAW_TRANSACTION.value}, "
+                f"Actual: {contract_api_msg.performative.value}"
+            )
+            return None
+
+        # Extract the multisend data and strip the 0x
+        multisend_data = cast(str, contract_api_msg.raw_transaction.body["data"])[2:]
+        self.context.logger.info(f"Multisend data is {multisend_data}")
+
+        # Prepare the Safe transaction
+        safe_tx_hash = yield from self._build_safe_tx_hash(
+            to_address=self.params.multisend_address,
+            value=ZERO_VALUE,  # the safe is not moving any native value into the multisend
+            data=bytes.fromhex(multisend_data),
+            operation=SafeOperation.DELEGATE_CALL.value,  # we are delegating the call to the multisend contract
+        )
+        return safe_tx_hash
+
+
     def sum_of_digits(self, n):
         """Helper function to calculate the sum of digits of a number, ignoring decimal points."""
         # Convert to string, remove decimal point and any numbers after it if present
