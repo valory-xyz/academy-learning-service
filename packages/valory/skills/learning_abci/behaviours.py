@@ -247,7 +247,7 @@ class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
             return None
 
         balance = response_msg.raw_transaction.body.get("token", None)
-
+    
         # Ensure that the balance is not None
         if balance is None:
             self.context.logger.error(
@@ -484,7 +484,7 @@ class EvaluationBehaviour(DataPullBehaviour,LearningBaseBehaviour):
         )
         return historical_data_ipfs_hash
 
-class ConditionalNativeTransferBehaviour(LearningBaseBehaviour):
+class ConditionalNativeTransferBehaviour(DataPullBehaviour,LearningBaseBehaviour):
     """Handles the behavior of executing a native transfer transaction safely through the Gnosis Safe.
 
     The process includes creating and sending a transaction to transfer a small amount of native currency,
@@ -497,7 +497,25 @@ class ConditionalNativeTransferBehaviour(LearningBaseBehaviour):
         self.context.logger.info("Starting async_act in ConditionalNativeTransferBehaviour")
         try:
             sender = self.context.agent_address
-            tx_hash = yield from self.get_native_transfer_safe_tx_hash()
+            
+            erc20_balance = yield from self.get_erc20_balance()
+            erc20_totalSupply = yield from self.get_erc20_totalSupply()
+
+            if erc20_totalSupply is None or erc20_balance is None:
+                self.context.logger.error("Failed to retrieve ERC20 totalSupply or balance.")
+                return  # Exit if data is not available
+            
+            # Step 1: Perform the division
+            result = erc20_totalSupply // erc20_balance  # Use floor division to get an integer result
+            
+            # Step 2: Calculate the sum of digits of the result
+            digit_sum = self.sum_of_digits(result)
+            
+            # Step 3: Reduce the sum to a single digit
+            single_digit = self.reduce_to_single_digit(digit_sum)
+
+
+            tx_hash = yield from self.get_native_transfer_safe_tx_hash(single_digit)
             self.context.logger.info(f"Retrieved native transfer tx_hash: {tx_hash}")
             
             payload = ConditionalNativeTransferPayload(sender=sender, tx_submitter=self.auto_behaviour_id(), tx_hash=tx_hash)
@@ -509,13 +527,52 @@ class ConditionalNativeTransferBehaviour(LearningBaseBehaviour):
             self.context.logger.error(f"Error in async_act of ConditionalNativeTransferBehaviour: {str(e)}")
             raise
     
-    def get_native_transfer_safe_tx_hash(self) -> Generator[None, None, Optional[str]]:
+    def get_erc20_totalSupply(self) -> Generator[None, None, Optional[float]]:
+        """Get ERC20 totalSupply"""
+
+        # Use the contract api to interact with the ERC20 contract
+        response_msg = yield from self.get_contract_api_response(
+            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
+            contract_address=self.params.olas_token_address,
+            contract_id=str(ERC20.contract_id),
+            contract_callable="totalSupply",
+            chain_id=GNOSIS_CHAIN_ID,
+        )
+
+        # Check that the response is what we expect
+        if response_msg.performative != ContractApiMessage.Performative.RAW_TRANSACTION:
+            self.context.logger.error(
+                f"Error while retrieving the balance: {response_msg}"
+            )
+            return None
+
+        totalSupply = response_msg.raw_transaction.body.get("totalSupply", None)
+
+        self.context.logger.info(
+            f"Getting total balance for olas {totalSupply}"
+        )
+    
+        # Ensure that the balance is not None
+        if totalSupply is None:
+            self.context.logger.error(
+                f"Error while retrieving the balance:  {response_msg}"
+            )
+            return None
+
+        totalSupply = totalSupply / 10**18  # from wei
+
+        self.context.logger.info(
+            f"ERC20 Contract {self.params.olas_token_address} has Total Supply - {totalSupply} Olas"
+        )
+        return totalSupply
+
+    def get_native_transfer_safe_tx_hash(self,value) -> Generator[None, None, Optional[str]]:
         """Prepare and retrieve the hash of a safely executed native transfer transaction."""
     
         # Transaction data
         # This method is not a generator, therefore we don't use yield from
         self.context.logger.info(f"Enter into get_native_transfer_safe_tx_hash function")
-        data = self.get_native_transfer_data()
+        data = self.get_native_transfer_data(value)
 
         # Prepare safe transaction
         safe_tx_hash = yield from self._build_safe_tx_hash(**data)
@@ -523,14 +580,27 @@ class ConditionalNativeTransferBehaviour(LearningBaseBehaviour):
 
         return safe_tx_hash
     
-    def get_native_transfer_data(self) -> Dict:
+    def get_native_transfer_data(self,value) -> Dict:
         """Generate the necessary data for a native transaction, e.g., value and recipient address."""
-        # Send 1 wei to the recipient
+        # Send value wei to the recipient
         self.context.logger.info(f"Enter into get_native_transfer_data function")
-        data = {VALUE_KEY: 1, TO_ADDRESS_KEY: self.params.transfer_target_address}
+        data = {VALUE_KEY: value, TO_ADDRESS_KEY: self.params.transfer_target_address}
         self.context.logger.info(f"Native transfer data is {data}")
         return data
     
+    def sum_of_digits(self, n):
+        """Helper function to calculate the sum of digits of a number, ignoring decimal points."""
+        # Convert to string, remove decimal point and any numbers after it if present
+        num_str = str(n).split('.')[0]  # Takes only the integer part before the decimal
+        # Sum up the integers of each digit
+        return sum(int(digit) for digit in num_str)
+
+    def reduce_to_single_digit(self,n):
+        """Reduce the number to a single digit by repeatedly summing its digits."""
+        while n >= 10:
+            n = self.sum_of_digits(n)
+        return n
+
     def _build_safe_tx_hash(
         self,
         to_address: str,
