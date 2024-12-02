@@ -148,8 +148,10 @@ class DefiLlamaPullRound(CollectSameUntilThresholdRound):
     collection_key = get_name(SynchronizedData.participant_to_data_round)
     selection_key = (
         get_name(SynchronizedData.tvl),
-        # get_name(SynchronizedData.tvl_ipfs_hash),
+        get_name(SynchronizedData.tvl_ipfs_hash),
     )
+
+    # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
 class DecisionMakingRound(CollectSameUntilThresholdRound):
     """DecisionMakingRound"""
@@ -214,8 +216,8 @@ class LearningAbciApp(AbciApp[Event]):
             Event.DONE: DefiLlamaPullRound,
         },
         DefiLlamaPullRound: {
-            Event.NO_MAJORITY: DataPullRound,
-            Event.ROUND_TIMEOUT: DataPullRound,
+            Event.NO_MAJORITY: DefiLlamaPullRound,
+            Event.ROUND_TIMEOUT: DefiLlamaPullRound,
             Event.DONE: DecisionMakingRound,
         },
         DecisionMakingRound: {

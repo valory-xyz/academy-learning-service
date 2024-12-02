@@ -25,6 +25,7 @@ start_states:
 - RegistrationStartupRound
 states:
 - DataPullRound
+- DefiLlamaPullRound
 - CheckLateTxHashesRound
 - CheckTransactionHistoryRound
 - CollectSignatureRound
@@ -42,9 +43,12 @@ states:
 - TxPreparationRound
 - ValidateTransactionRound
 transition_func:
-    (DataPullRound, DONE): DecisionMakingRound
+    (DataPullRound, DONE): DefiLlamaPullRound
     (DataPullRound, NO_MAJORITY): DataPullRound
     (DataPullRound, ROUND_TIMEOUT): DataPullRound
+    (DefiLlamaPullRound, DONE): DecisionMakingRound
+    (DefiLlamaPullRound, NO_MAJORITY): DefiLlamaPullRound
+    (DefiLlamaPullRound, ROUND_TIMEOUT): DefiLlamaPullRound
     (CheckLateTxHashesRound, CHECK_LATE_ARRIVING_MESSAGE): SynchronizeLateMessagesRound
     (CheckLateTxHashesRound, CHECK_TIMEOUT): CheckLateTxHashesRound
     (CheckLateTxHashesRound, DONE): ResetAndPauseRound

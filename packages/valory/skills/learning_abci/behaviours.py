@@ -104,9 +104,9 @@ class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-anc
         return self.context.coingecko_specs
 
     @property
-    def defi_llama_specs(self) -> DefiLlamaSpecs:
+    def defillama_specs(self) -> DefiLlamaSpecs:
         """Get the DefiLlama api specs."""
-        return self.context.defi_llama_specs
+        return self.context.defillama_specs
 
     @property
     def metadata_filepath(self) -> str:
@@ -296,13 +296,10 @@ class DefiLlamaPullBehaviour(LearningBaseBehaviour): # pylint: disable=too-many-
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             sender = self.context.agent_address
-            self.context.logger.info(f"Starting DefiLlamaPullBehaviour from sender={sender}")
-
+            self.context.logger.info(f"Starting DefiLlamaPullBehaviour from Agent: {sender}")
             tvl = yield from self.get_uniswap_tvl()
-
             self.context.logger.info(f"Uploading to IPFS={tvl}")
-
-            ipfs_hash = yield from self.send_fear_greed_value_to_ipfs(tvl)
+            ipfs_hash = yield from self.send_tvl_to_ipfs(tvl)
         
             payload = DefiLlamaPullPayload(
                 sender=sender, 
@@ -317,32 +314,26 @@ class DefiLlamaPullBehaviour(LearningBaseBehaviour): # pylint: disable=too-many-
 
     def get_uniswap_tvl(self) -> Generator[None, None, Optional[float]]:
         """Get Uniswap TVL from DefiLlama"""
-        self.context.logger.info("Getting Uniswap TVL")
-
-        specs = self.defi_llama_specs.get_spec()
+        self.context.logger.info("Attempting to fetch Uniswap TVL")
+        specs = self.defillama_specs.get_spec()
         response = yield from self.get_http_response(**specs)
-        response = self.defi_llama_specs.process_response(response)
-        
-        self.context.logger.info(f"Got Uniswap TVL: {response}")
-
-        tvl: float = response
+        tvl = float(response.body)
+        self.context.logger.info(f"Got response: {float(response.body)}")
+        # tvl = self.defillama_specs.process_response(response)
+        self.context.logger.info(f"Got Uniswap TVL: {tvl}")
 
         return tvl
     
     def send_tvl_to_ipfs(self, tvl: float) -> Generator[None, None, Optional[str]]:
         """Send TVL to IPFS"""
-        self.context.logger.info("Sending TVL to IPFS")
-
-        response = yield from self.send_to_ipfs(
-            filename=self.metadata_filepath, obj=tvl, filetype=SupportedFiletype.JSON
+        data = {"tvl": tvl}
+        self.context.logger.info("Uploading Uniswap TVL to IPFS")
+        tvl_ipfs_hash = yield from self.send_to_ipfs(
+            filename=self.metadata_filepath, obj=data, filetype=SupportedFiletype.JSON
         )
-        response = self.ipfs_specs.process_response(response)
+        self.context.logger.info(f"Uploading Object: {data} with hash: {tvl_ipfs_hash}")
 
-        self.context.logger.info(f"Sent TVL to IPFS: {response}")
-
-        ipfs_hash: str = response
-
-        return ipfs_hash
+        return tvl_ipfs_hash
 
 class DecisionMakingBehaviour(
     LearningBaseBehaviour
@@ -723,7 +714,7 @@ class LearningRoundBehaviour(AbstractRoundBehaviour):
     abci_app_cls = LearningAbciApp  # type: ignore
     behaviours: Set[Type[BaseBehaviour]] = [  # type: ignore
         DataPullBehaviour,
-        DefiLlamaPullRound,
+        DefiLlamaPullBehaviour,
         DecisionMakingBehaviour,
         TxPreparationBehaviour,
     ]

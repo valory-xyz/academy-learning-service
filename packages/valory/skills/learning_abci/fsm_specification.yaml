@@ -23,8 +23,8 @@ transition_func:
     (DataPullRound, NO_MAJORITY): DataPullRound
     (DataPullRound, ROUND_TIMEOUT): DataPullRound
     (DefiLlamaPullRound, DONE): DecisionMakingRound
-    (DefiLlamaPullRound, NO_MAJORITY): DataPullRound
-    (DefiLlamaPullRound, ROUND_TIMEOUT): DataPullRound
+    (DefiLlamaPullRound, NO_MAJORITY): DefiLlamaPullRound
+    (DefiLlamaPullRound, ROUND_TIMEOUT): DefiLlamaPullRound
     (DecisionMakingRound, DONE): FinishedDecisionMakingRound
     (DecisionMakingRound, ERROR): FinishedDecisionMakingRound
     (DecisionMakingRound, NO_MAJORITY): DecisionMakingRound

@@ -7,13 +7,13 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeiho3lkochqpmes4f235chq26oggmwnol3vjuvhosleoubbjirbwaq
-  behaviours.py: bafybeieucuf7aafatcisbkmsu34rsyr3pfaizgnfpl562zvla7xhz52soi
+  behaviours.py: bafybeiapgcerabdff4xwvvscwrn6nlldqgmud3o2tdgoilfjbxnojpltpm
   dialogues.py: bafybeifqjbumctlffx2xvpga2kcenezhe47qhksvgmaylyp5ypwqgfar5u
-  fsm_specification.yaml: bafybeiawdxybtin4b37qcya3j3cyf7zaj4gefax3mrqw6x5ta35ipquyx4
+  fsm_specification.yaml: bafybeihfobaj5rvi5rlktolqyediwhtfujccjbos6j2o6sottxtn7sxpni
   handlers.py: bafybeigjadr4thz6hfpfx5abezbwnqhbxmachf4efasrn4z2vqhsqgnyvi
   models.py: bafybeiefdb42mnild4pkh27mfzfjowjvcuqdw5ncqkha32sichiponusxq
   payloads.py: bafybeicnwmdjspjqfpwoe2zlz6iivteb2h6ikac2we6t7u6ito5ba2opve
-  rounds.py: bafybeigyp3an3we62bljkwozkcb3svvr66x4n5vla3ngt4cqfw7wu42pye
+  rounds.py: bafybeih5dwqedvqa6mcgkiwfbljind5e7psx5kpczlcztlcmaenmhpnfsa
 fingerprint_ignore_patterns: []
 connections: []
 contracts:
@@ -58,7 +58,7 @@ models:
     class_name: AbciDialogues
   benchmark_tool:
     args:
-      log_dir: /logs
+      log_dir: /tmp
     class_name: BenchmarkTool
   contract_api_dialogues:
     args: {}

@@ -7,7 +7,7 @@ license: Apache-2.0
 fingerprint:
   README.md: bafybeid42pdrf6qrohedylj4ijrss236ai6geqgf3he44huowiuf7pl464
 fingerprint_ignore_patterns: []
-agent: valory/learning_agent:0.1.0:bafybeibeqelldpm4qelz63pagjyi554orpe6uwndouojvr7qs4h7ufu3hy
+agent: valory/learning_agent:0.1.0:bafybeihjaw6tf2qfqv6nojehh52qdio6co5iernvsdmlb42vibceyxycwy
 number_of_agents: 4
 deployment:
   agent:
@@ -51,7 +51,7 @@ extra:
   models:
     benchmark_tool:
       args:
-        log_dir: ${LOG_DIR:str:/logs}
+        log_dir: ${LOG_DIR:str:/tmp}
     params:
       args:
         setup: *id001
@@ -122,7 +122,7 @@ extra:
   models:
     benchmark_tool:
       args:
-        log_dir: ${LOG_DIR:str:/logs}
+        log_dir: ${LOG_DIR:str:/tmp}
     params:
       args:
         setup: *id001
@@ -193,7 +193,7 @@ extra:
   models:
     benchmark_tool:
       args:
-        log_dir: ${LOG_DIR:str:/logs}
+        log_dir: ${LOG_DIR:str:/tmp}
     params:
       args:
         setup: *id001
@@ -264,7 +264,7 @@ extra:
   models:
     benchmark_tool:
       args:
-        log_dir: ${LOG_DIR:str:/logs}
+        log_dir: ${LOG_DIR:str:/tmp}
     params:
       args:
         setup: *id001

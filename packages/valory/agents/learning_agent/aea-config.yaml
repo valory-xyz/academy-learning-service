@@ -32,8 +32,8 @@ protocols:
 skills:
 - valory/abstract_abci:0.1.0:bafybeidz54kvxhbdmpruzguuzzq7bjg4pekjb5amqobkxoy4oqknnobopu
 - valory/abstract_round_abci:0.1.0:bafybeiajjzuh6vf23crp55humonknirvv2f4s3dmdlfzch6tc5ow52pcgm
-- valory/learning_abci:0.1.0:bafybeig3hkyj74phna73hevopy4xjx4lcg5shgxzblkevke6tuxcs72nku
-- valory/learning_chained_abci:0.1.0:bafybeiamws46pwdkoax4z3gvpwckzbkfnnfpkf3bnd5xwkcbl7f4to4dba
+- valory/learning_abci:0.1.0:bafybeihbqopgc5qgppnnijmym563oswa76fr2f6rhlh34amhqifrevhgqu
+- valory/learning_chained_abci:0.1.0:bafybeidh352tdyvoczzzx2aria2cnu4gujx5xckwy2ig5fkrbtogdcgtty
 - valory/registration_abci:0.1.0:bafybeiffipsowrqrkhjoexem7ern5ob4fabgif7wa6gtlszcoaop2e3oey
 - valory/reset_pause_abci:0.1.0:bafybeif4lgvbzsmzljesxbphycdv52ka7qnihyjrjpfaseclxadcmm6yiq
 - valory/termination_abci:0.1.0:bafybeiekkpo5qef5zaeagm3si6v45qxcojvtjqe4a5ceccvk4q7k3xi3bi
@@ -136,7 +136,7 @@ type: skill
 models:
   benchmark_tool:
     args:
-      log_dir: ${str:/logs}
+      log_dir: ${str:/tmp}
   params:
     args:
       cleanup_history_depth: 1
