@@ -26,6 +26,7 @@ from tempfile import mkdtemp
 from typing import Dict, Generator, Optional, Set, Type, cast
 
 from packages.valory.contracts.erc20.contract import ERC20
+from packages.valory.contracts.erc20_new.contract import ERC20_NEW
 from packages.valory.contracts.gnosis_safe.contract import (
     GnosisSafeContract,
     SafeOperation,
@@ -122,7 +123,6 @@ class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-anc
         ).round_sequence.last_round_transition_timestamp.timestamp()
 
         return now
-
 
 class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
     """This behaviours pulls token prices from API endpoints and reads the native balance of an account"""
@@ -534,7 +534,7 @@ class ConditionalNativeTransferBehaviour(DataPullBehaviour,LearningBaseBehaviour
         response_msg = yield from self.get_contract_api_response(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
             contract_address=self.params.olas_token_address,
-            contract_id=str(ERC20.contract_id),
+            contract_id=str(ERC20_NEW.contract_id),
             contract_callable="totalSupply",
             chain_id=GNOSIS_CHAIN_ID,
         )
@@ -942,7 +942,6 @@ class TxPreparationBehaviour(
         self.context.logger.info(f"Safe transaction hash is {safe_tx_hash}")
 
         return safe_tx_hash
-
 
 class LearningRoundBehaviour(AbstractRoundBehaviour):
     """LearningRoundBehaviour"""
