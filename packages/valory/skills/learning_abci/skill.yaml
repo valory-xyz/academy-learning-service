@@ -7,13 +7,13 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeiho3lkochqpmes4f235chq26oggmwnol3vjuvhosleoubbjirbwaq
-  behaviours.py: bafybeiaiy6sh7aqo4zzghnejv55vs43vqtpaipj5cpabx32qdjrqleeeie
+  behaviours.py: bafybeieucuf7aafatcisbkmsu34rsyr3pfaizgnfpl562zvla7xhz52soi
   dialogues.py: bafybeifqjbumctlffx2xvpga2kcenezhe47qhksvgmaylyp5ypwqgfar5u
-  fsm_specification.yaml: bafybeigbbydxuqephdpatb3fp3sxnvr77bfvvo5hwjimxfpgyl32wupe64
+  fsm_specification.yaml: bafybeiawdxybtin4b37qcya3j3cyf7zaj4gefax3mrqw6x5ta35ipquyx4
   handlers.py: bafybeigjadr4thz6hfpfx5abezbwnqhbxmachf4efasrn4z2vqhsqgnyvi
-  models.py: bafybeicreffhurci7jzpwvxnlo5z3a2j3vcfgkopg2gtwwxfrncbzk77ra
-  payloads.py: bafybeidc6qqnfvd7qovjatt2i2kbga7pj6epdghlzqxdhzx6b6j6p7ubvm
-  rounds.py: bafybeibcxdou2opzsof4fcnaijfdgzpaaggmucyolhegns3k4zpzvuom2i
+  models.py: bafybeiefdb42mnild4pkh27mfzfjowjvcuqdw5ncqkha32sichiponusxq
+  payloads.py: bafybeicnwmdjspjqfpwoe2zlz6iivteb2h6ikac2we6t7u6ito5ba2opve
+  rounds.py: bafybeigyp3an3we62bljkwozkcb3svvr66x4n5vla3ngt4cqfw7wu42pye
 fingerprint_ignore_patterns: []
 connections: []
 contracts:
@@ -147,6 +147,17 @@ models:
       retries: 5
       url: https://api.coingecko.com/api/v3/simple/price
     class_name: CoingeckoSpecs
+  defillama_specs:
+    args:
+      api_id: defillama
+      headers: {}
+      method: GET
+      parameters: {}
+      response_key: null
+      response_type: dict
+      retries: 5
+      url: https://api.llama.fi/tvl/uniswap
+    class_name: DefiLlamaSpecs
   requests:
     args: {}
     class_name: Requests

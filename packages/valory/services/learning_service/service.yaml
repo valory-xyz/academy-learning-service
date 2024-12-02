@@ -7,7 +7,7 @@ license: Apache-2.0
 fingerprint:
   README.md: bafybeid42pdrf6qrohedylj4ijrss236ai6geqgf3he44huowiuf7pl464
 fingerprint_ignore_patterns: []
-agent: valory/learning_agent:0.1.0:bafybeiatizepnj42umexk3p5rnop67cdshbgrflvnysaagm3t4xqo74kem
+agent: valory/learning_agent:0.1.0:bafybeibeqelldpm4qelz63pagjyi554orpe6uwndouojvr7qs4h7ufu3hy
 number_of_agents: 4
 deployment:
   agent:
@@ -108,6 +108,16 @@ extra:
         response_type: dict
         retries: 5
         url: https://api.coingecko.com/api/v3/simple/price
+    defillama_specs:
+      args:
+        api_id: defillama
+        headers: {}
+        method: GET
+        parameters: {}
+        response_key: null
+        response_type: dict
+        retries: 5
+        url: https://api.llama.fi/tvl/uniswap
 1:
   models:
     benchmark_tool:
@@ -169,6 +179,16 @@ extra:
         response_type: dict
         retries: 5
         url: https://api.coingecko.com/api/v3/simple/price
+    defillama_specs:
+      args:
+        api_id: defillama
+        headers: {}
+        method: GET
+        parameters: {}
+        response_key: null
+        response_type: dict
+        retries: 5
+        url: https://api.llama.fi/tvl/uniswap
 2:
   models:
     benchmark_tool:
@@ -230,6 +250,16 @@ extra:
         response_type: dict
         retries: 5
         url: https://api.coingecko.com/api/v3/simple/price
+    defillama_specs:
+      args:
+        api_id: defillama
+        headers: {}
+        method: GET
+        parameters: {}
+        response_key: null
+        response_type: dict
+        retries: 5
+        url: https://api.llama.fi/tvl/uniswap
 3:
   models:
     benchmark_tool:
@@ -291,6 +321,16 @@ extra:
         response_type: dict
         retries: 5
         url: https://api.coingecko.com/api/v3/simple/price
+    defillama_specs:
+      args:
+        api_id: defillama
+        headers: {}
+        method: GET
+        parameters: {}
+        response_key: null
+        response_type: dict
+        retries: 5
+        url: https://api.llama.fi/tvl/uniswap
 ---
 public_id: valory/ledger:0.19.0
 type: connection

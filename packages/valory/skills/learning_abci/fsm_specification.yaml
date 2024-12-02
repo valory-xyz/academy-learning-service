@@ -13,14 +13,18 @@ start_states:
 - DataPullRound
 states:
 - DataPullRound
+- DefiLlamaPullRound
 - DecisionMakingRound
 - FinishedDecisionMakingRound
 - FinishedTxPreparationRound
 - TxPreparationRound
 transition_func:
-    (DataPullRound, DONE): DecisionMakingRound
+    (DataPullRound, DONE): DefiLlamaPullRound
     (DataPullRound, NO_MAJORITY): DataPullRound
     (DataPullRound, ROUND_TIMEOUT): DataPullRound
+    (DefiLlamaPullRound, DONE): DecisionMakingRound
+    (DefiLlamaPullRound, NO_MAJORITY): DataPullRound
+    (DefiLlamaPullRound, ROUND_TIMEOUT): DataPullRound
     (DecisionMakingRound, DONE): FinishedDecisionMakingRound
     (DecisionMakingRound, ERROR): FinishedDecisionMakingRound
     (DecisionMakingRound, NO_MAJORITY): DecisionMakingRound

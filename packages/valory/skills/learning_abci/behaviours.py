@@ -44,16 +44,19 @@ from packages.valory.skills.abstract_round_abci.behaviours import (
 from packages.valory.skills.abstract_round_abci.io_.store import SupportedFiletype
 from packages.valory.skills.learning_abci.models import (
     CoingeckoSpecs,
+    DefiLlamaSpecs,
     Params,
     SharedState,
 )
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
+    DefiLlamaPullPayload,
     DecisionMakingPayload,
     TxPreparationPayload,
 )
 from packages.valory.skills.learning_abci.rounds import (
     DataPullRound,
+    DefiLlamaPullRound,
     DecisionMakingRound,
     Event,
     LearningAbciApp,
@@ -99,6 +102,11 @@ class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-anc
     def coingecko_specs(self) -> CoingeckoSpecs:
         """Get the Coingecko api specs."""
         return self.context.coingecko_specs
+
+    @property
+    def defi_llama_specs(self) -> DefiLlamaSpecs:
+        """Get the DefiLlama api specs."""
+        return self.context.defi_llama_specs
 
     @property
     def metadata_filepath(self) -> str:
@@ -151,7 +159,7 @@ class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
                 erc20_balance=erc20_balance,
             )
 
-        # Send the payload to all agents and mark the behaviour as done
+        # Send the payload to all agents and mark the behaviour a∂s done
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
             yield from self.wait_until_round_end()
@@ -278,6 +286,63 @@ class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
 
         return balance
 
+class DefiLlamaPullBehaviour(LearningBaseBehaviour): # pylint: disable=too-many-ancestors
+    """DefiLlamaPullBehaviour"""
+
+    matching_round: Type[AbstractRound] = DefiLlamaPullRound
+
+    def async_act(self) -> Generator:
+        """Do the act, supporting asynchronous execution."""
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).local():
+            sender = self.context.agent_address
+            self.context.logger.info(f"Starting DefiLlamaPullBehaviour from sender={sender}")
+
+            tvl = yield from self.get_uniswap_tvl()
+
+            self.context.logger.info(f"Uploading to IPFS={tvl}")
+
+            ipfs_hash = yield from self.send_fear_greed_value_to_ipfs(tvl)
+        
+            payload = DefiLlamaPullPayload(
+                sender=sender, 
+                tvl=tvl, 
+                tvl_ipfs_hash=ipfs_hash)
+            
+        with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
+            yield from self.send_a2a_transaction(payload)
+            yield from self.wait_until_round_end()
+        
+        self.set_done()
+
+    def get_uniswap_tvl(self) -> Generator[None, None, Optional[float]]:
+        """Get Uniswap TVL from DefiLlama"""
+        self.context.logger.info("Getting Uniswap TVL")
+
+        specs = self.defi_llama_specs.get_spec()
+        response = yield from self.get_http_response(**specs)
+        response = self.defi_llama_specs.process_response(response)
+        
+        self.context.logger.info(f"Got Uniswap TVL: {response}")
+
+        tvl: float = response
+
+        return tvl
+    
+    def send_tvl_to_ipfs(self, tvl: float) -> Generator[None, None, Optional[str]]:
+        """Send TVL to IPFS"""
+        self.context.logger.info("Sending TVL to IPFS")
+
+        response = yield from self.send_to_ipfs(
+            filename=self.metadata_filepath, obj=tvl, filetype=SupportedFiletype.JSON
+        )
+        response = self.ipfs_specs.process_response(response)
+
+        self.context.logger.info(f"Sent TVL to IPFS: {response}")
+
+        ipfs_hash: str = response
+
+        return ipfs_hash
 
 class DecisionMakingBehaviour(
     LearningBaseBehaviour
@@ -658,6 +723,7 @@ class LearningRoundBehaviour(AbstractRoundBehaviour):
     abci_app_cls = LearningAbciApp  # type: ignore
     behaviours: Set[Type[BaseBehaviour]] = [  # type: ignore
         DataPullBehaviour,
+        DefiLlamaPullRound,
         DecisionMakingBehaviour,
         TxPreparationBehaviour,
     ]

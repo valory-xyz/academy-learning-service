@@ -36,6 +36,7 @@ from packages.valory.skills.abstract_round_abci.base import (
 )
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
+    DefiLlamaPullPayload,
     DecisionMakingPayload,
     TxPreparationPayload,
 )
@@ -82,6 +83,16 @@ class SynchronizedData(BaseSynchronizedData):
     def erc20_balance(self) -> Optional[float]:
         """Get the erc20 balance."""
         return self.db.get("erc20_balance", None)
+    
+    @property
+    def tvl(self) -> Optional[float]:
+        """Get the Uniswap TVL."""
+        return self.db.get("tvl", None)
+    
+    @property
+    def tvl_ipfs_hash(self) -> Optional[str]:
+        """Get the TVL IPFS Hash."""
+        return self.db.get("tvl_ipfs_hash", None)
 
     @property
     def participant_to_data_round(self) -> DeserializedCollection:
@@ -127,6 +138,18 @@ class DataPullRound(CollectSameUntilThresholdRound):
 
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
+class DefiLlamaPullRound(CollectSameUntilThresholdRound):
+    """DefiLlamaPullRound"""
+
+    payload_class = DefiLlamaPullPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    no_majority_event = Event.NO_MAJORITY
+    collection_key = get_name(SynchronizedData.participant_to_data_round)
+    selection_key = (
+        get_name(SynchronizedData.tvl),
+        # get_name(SynchronizedData.tvl_ipfs_hash),
+    )
 
 class DecisionMakingRound(CollectSameUntilThresholdRound):
     """DecisionMakingRound"""
@@ -188,6 +211,11 @@ class LearningAbciApp(AbciApp[Event]):
         DataPullRound: {
             Event.NO_MAJORITY: DataPullRound,
             Event.ROUND_TIMEOUT: DataPullRound,
+            Event.DONE: DefiLlamaPullRound,
+        },
+        DefiLlamaPullRound: {
+            Event.NO_MAJORITY: DataPullRound,
+            Event.ROUND_TIMEOUT: DataPullRound,
             Event.DONE: DecisionMakingRound,
         },
         DecisionMakingRound: {
@@ -213,6 +241,7 @@ class LearningAbciApp(AbciApp[Event]):
     cross_period_persisted_keys: FrozenSet[str] = frozenset()
     db_pre_conditions: Dict[AppState, Set[str]] = {
         DataPullRound: set(),
+        DefiLlamaPullRound: set()
     }
     db_post_conditions: Dict[AppState, Set[str]] = {
         FinishedDecisionMakingRound: set(),
