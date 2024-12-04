@@ -55,6 +55,8 @@ class Params(BaseParams):
             "transfer_target_address", kwargs, str
         )
         self.olas_token_address = self._ensure("olas_token_address", kwargs, str)
+        
+        print("olas token contract address",self.olas_token_address)
 
         # multisend address is used in other skills, so we cannot pop it using _ensure
         self.multisend_address = kwargs.get("multisend_address", "")

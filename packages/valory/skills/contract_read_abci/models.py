@@ -48,7 +48,7 @@ class Params(BaseParams):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize the parameters object."""
         
-        self.olas_token_address = self._ensure("olas_token_address", kwargs, str)  # This should correctly fetch the parameter
+        self.olas_token_address = kwargs.get("olas_token_address", None)  # This should correctly fetch the parameter
         self.coingecko_api_key = kwargs.get("coingecko_api_key", None)
         
         super().__init__(*args, **kwargs)

@@ -11,14 +11,14 @@ fingerprint:
   dialogues.py: bafybeibbir7usmm3cxo42edjvnfx4tszqgow2nxusa55kp4a5axaomfvse
   fsm_specification.yaml: bafybeice32ubhasmudzpbp6gaiyxba7bxy2dfrq4agntgzs43hphafxpf4
   handlers.py: bafybeidlarc2gralqs7opv2gd72jpjnbivsnaxhoqy7j6xouocf6w23kgy
-  models.py: bafybeida4qibu5kvetl24xbscz6twkmenhxu6cwnzwyj2czd6377n2hjfy
+  models.py: bafybeihctoswbtutwloj6pbf5suhaocpvqjuvgkxnq3dtz55ls2jpj6ipm
   payloads.py: bafybeiedat6ks7de5lwjbjlkfznfv7xiqtwvruh65liah3rrgqy7g3v75q
   rounds.py: bafybeih6ete5rmuvm22s2djjrfvyq2kcbmjom7ghsempfbvejlg62xu5by
 fingerprint_ignore_patterns: []
 connections: []
 contracts:
 - valory/erc20:0.1.0:bafybeie7n4azsbr6i3wlovh5f3qmke6eh4l6zpualde2k2eej4imfyjtjm
-- valory/erc20_new:0.1.0:bafybeicfi6l5yhkblvk7t5vc22yeuezbo4uwuuhhqlfwnk2zgnwjerlot4
+- valory/erc20_new:0.1.0:bafybeif2ajrxvhhtew2m5c7iiacqkp3gnnib6atzyxipwyklzkpottomdq
 protocols:
 - valory/contract_api:1.0.0:bafybeidgu7o5llh26xp3u3ebq3yluull5lupiyeu6iooi2xyymdrgnzq5i
 - valory/ledger_api:1.0.0:bafybeihdk6psr4guxmbcrc26jr2cbgzpd5aljkqvpwo64bvaz7tdti2oni

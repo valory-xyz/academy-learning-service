@@ -227,6 +227,10 @@ class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
         self.context.logger.info(
             f"Getting Olas balance for Safe {self.synchronized_data.safe_contract_address}"
         )
+        
+        self.context.logger.info(
+            f"Getting contract address for Safe {self.params.olas_token_address}"
+        )
 
         # Use the contract api to interact with the ERC20 contract
         response_msg = yield from self.get_contract_api_response(
