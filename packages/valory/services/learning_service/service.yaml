@@ -7,7 +7,7 @@ license: Apache-2.0
 fingerprint:
   README.md: bafybeid42pdrf6qrohedylj4ijrss236ai6geqgf3he44huowiuf7pl464
 fingerprint_ignore_patterns: []
-agent: valory/learning_agent:0.1.0:bafybeiatizepnj42umexk3p5rnop67cdshbgrflvnysaagm3t4xqo74kem
+agent: valory/learning_agent:0.1.0:bafybeifxr6lxeppf2635xu6odre2hqcydjqi7r63ilq4tv7koqkevs76eu
 number_of_agents: 4
 deployment:
   agent:
@@ -108,6 +108,19 @@ extra:
         response_type: dict
         retries: 5
         url: https://api.coingecko.com/api/v3/simple/price
+    coingecko_pricehistorydata_specs:
+      args:
+        api_id: coingecko
+        headers:
+          Accept: application/json
+        method: GET
+        parameters:
+          vs_currency: usd
+          days: 1
+        response_key: prices
+        response_type: list
+        retries: 5
+        url: https://api.coingecko.com/api/v3/coins/autonolas/market_chart
 1:
   models:
     benchmark_tool:
@@ -169,6 +182,19 @@ extra:
         response_type: dict
         retries: 5
         url: https://api.coingecko.com/api/v3/simple/price
+    coingecko_pricehistorydata_specs:
+      args:
+        api_id: coingecko
+        headers:
+          Accept: application/json
+        method: GET
+        parameters:
+          vs_currency: usd
+          days: 1
+        response_key: prices
+        response_type: list
+        retries: 5
+        url: https://api.coingecko.com/api/v3/coins/autonolas/market_chart
 2:
   models:
     benchmark_tool:
@@ -230,6 +256,19 @@ extra:
         response_type: dict
         retries: 5
         url: https://api.coingecko.com/api/v3/simple/price
+    coingecko_pricehistorydata_specs:
+      args:
+        api_id: coingecko
+        headers:
+          Accept: application/json
+        method: GET
+        parameters:
+          vs_currency: usd
+          days: 1
+        response_key: prices
+        response_type: list
+        retries: 5
+        url: https://api.coingecko.com/api/v3/coins/autonolas/market_chart
 3:
   models:
     benchmark_tool:
@@ -291,6 +330,19 @@ extra:
         response_type: dict
         retries: 5
         url: https://api.coingecko.com/api/v3/simple/price
+    coingecko_pricehistorydata_specs:
+      args:
+        api_id: coingecko
+        headers:
+          Accept: application/json
+        method: GET
+        parameters:
+          vs_currency: usd
+          days: 1
+        response_key: prices
+        response_type: list
+        retries: 5
+        url: https://api.coingecko.com/api/v3/coins/autonolas/market_chart
 ---
 public_id: valory/ledger:0.19.0
 type: connection
