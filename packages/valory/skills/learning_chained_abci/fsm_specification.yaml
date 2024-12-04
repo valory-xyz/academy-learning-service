@@ -67,7 +67,7 @@ transition_func:
     (DecisionMakingRound, ROUND_TIMEOUT): DecisionMakingRound
     (DecisionMakingRound, TRANSACT): EvaluationRound
     (EvaluationRound, DONE): TxPreparationRound
-    (EvaluationRound, ERROR): EvaluationRound
+    (EvaluationRound, ERROR): ResetAndPauseRound
     (EvaluationRound, NO_MAJORITY): EvaluationRound
     (EvaluationRound, ROUND_TIMEOUT): EvaluationRound
     (FinalizationRound, CHECK_HISTORY): CheckTransactionHistoryRound
