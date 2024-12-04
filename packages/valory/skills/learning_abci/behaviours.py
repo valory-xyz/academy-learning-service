@@ -26,6 +26,7 @@ from tempfile import mkdtemp
 from typing import Dict, Generator, Optional, Set, Type, cast
 
 from packages.valory.contracts.erc20.contract import ERC20
+from packages.valory.contracts.erc20_new.contract import ERC20_NEW
 from packages.valory.contracts.gnosis_safe.contract import (
     GnosisSafeContract,
     SafeOperation,
@@ -46,15 +47,20 @@ from packages.valory.skills.learning_abci.models import (
     CoingeckoSpecs,
     Params,
     SharedState,
+    Coingeckopricehistorydataspecs,
 )
 from packages.valory.skills.learning_abci.payloads import (
+    ConditionalNativeTransferPayload,
     DataPullPayload,
     DecisionMakingPayload,
+    EvaluationPayload,
     TxPreparationPayload,
 )
 from packages.valory.skills.learning_abci.rounds import (
+    ConditionalNativeTransferRound,
     DataPullRound,
     DecisionMakingRound,
+    EvaluationRound,
     Event,
     LearningAbciApp,
     SynchronizedData,
@@ -99,6 +105,11 @@ class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-anc
     def coingecko_specs(self) -> CoingeckoSpecs:
         """Get the Coingecko api specs."""
         return self.context.coingecko_specs
+    
+    @property
+    def coingecko_pricehistorydata_specs(self) -> Coingeckopricehistorydataspecs:
+        """Get the Coingecko api specs."""
+        return self.context.coingecko_pricehistorydata_specs
 
     @property
     def metadata_filepath(self) -> str:
@@ -112,7 +123,6 @@ class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-anc
         ).round_sequence.last_round_transition_timestamp.timestamp()
 
         return now
-
 
 class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ancestors
     """This behaviours pulls token prices from API endpoints and reads the native balance of an account"""
@@ -237,7 +247,7 @@ class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
             return None
 
         balance = response_msg.raw_transaction.body.get("token", None)
-
+    
         # Ensure that the balance is not None
         if balance is None:
             self.context.logger.error(
@@ -277,7 +287,6 @@ class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
         self.context.logger.error(f"Got native balance: {balance}")
 
         return balance
-
 
 class DecisionMakingBehaviour(
     LearningBaseBehaviour
@@ -384,6 +393,335 @@ class DecisionMakingBehaviour(
         self.context.logger.error(f"Got price from IPFS: {price}")
         return price
 
+class EvaluationBehaviour(DataPullBehaviour,LearningBaseBehaviour):
+    """Behaviour to handle the evaluation of current vs historical prices."""
+    
+    matching_round: Type[AbstractRound] = EvaluationRound
+    
+    def async_act(self) -> Generator:
+        """Perform the evaluation logic."""
+        try:
+            with self.context.benchmark_tool.measure(self.behaviour_id).local():
+                self.context.logger.debug("Starting EvaluationBehaviour logic")
+                
+                current_price = yield from self.get_token_price_specs()
+                self.context.logger.info(f"Current price fetched: {current_price}")
+
+                historical_data = yield from self.get_historical_price_data()
+                self.context.logger.info(f"Historical data fetched: {historical_data}")
+                
+                if not historical_data:
+                    self.context.logger.error("No historical data available.")
+                    return self.synchronized_data, Event.ERROR
+
+                average_historical_price = sum(historical_data) / len(historical_data)
+                self.context.logger.info(f"Average historical price computed: {average_historical_price}")
+
+                comparison_result = self.compare_prices(current_price, average_historical_price)
+                self.context.logger.info(f"Price comparison result: {comparison_result}")
+
+                historical_data_ipfs_hash = yield from self.send_historical_data_to_ipfs(historical_data)
+                self.context.logger.info(f"Historical data IPFS hash: {historical_data_ipfs_hash}")
+
+                payload = EvaluationPayload(
+                    sender=self.context.agent_address,
+                    historical_data_ipfs_hash=historical_data_ipfs_hash,
+                    comparison_data=comparison_result,
+                )
+                self.context.logger.info("EvaluationPayload prepared and being sent.")
+
+            with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
+                yield from self.send_a2a_transaction(payload)
+                yield from self.wait_until_round_end()
+                self.context.logger.info("EvaluationBehaviour completed.")
+
+            self.set_done()
+
+        except Exception as e:
+            self.context.logger.error(f"Error in EvaluationBehaviour: {str(e)}")
+            raise
+    
+    def compare_prices(self, current, historical_average) -> str:
+        """Log comparison of current price to historical average."""
+        if current > historical_average:
+            self.context.logger.info("Current price is higher than the average of last day.")
+        elif current < historical_average:
+            self.context.logger.info("Current price is lower than the average of last day.")
+        else:
+            self.context.logger.info("Current price is the same as the average of last day.")
+        return current > historical_average
+
+    def get_historical_price_data(self) -> Generator[None, None, list[float]]:
+        """Fetch historical price data from the Coingecko API."""
+        try:
+            self.context.logger.debug("Fetching historical price data.")
+            specs = self.coingecko_pricehistorydata_specs.get_spec()
+            response = yield from self.get_http_response(**specs)
+            if response.status_code != HTTP_OK:
+                self.context.logger.error(f"Failed to fetch historical data: {response.body}")
+                return []
+    
+            historical_data = self.coingecko_pricehistorydata_specs.process_response(response)
+            if historical_data is None:
+                self.context.logger.error("No historical data returned from processing.")
+                return []
+    
+            prices = [price[1] for price in historical_data]
+            self.context.logger.info(f"Historical prices fetched: {prices}")
+            return prices  # Assuming prices is a list of floats
+        except Exception as e:
+            self.context.logger.error(f"Exception in fetching historical data: {str(e)}")
+            return []
+
+    def send_historical_data_to_ipfs(self, historical_data) -> Generator[None, None, Optional[str]]:
+        """Store the historical price data in IPFS."""
+        data = {"historical_prices": historical_data}
+        historical_data_ipfs_hash = yield from self.send_to_ipfs(
+            filename=self.metadata_filepath, obj=data, filetype=SupportedFiletype.JSON
+        )
+        self.context.logger.info(
+            f"Historical price data stored in IPFS: https://gateway.autonolas.tech/ipfs/{historical_data_ipfs_hash}"
+        )
+        return historical_data_ipfs_hash
+
+class ConditionalNativeTransferBehaviour(DataPullBehaviour,LearningBaseBehaviour):
+    """Handles the execution of a native transfer transaction and safely deposits the native coin into an ERC20 contract through the Gnosis Safe. 
+    The process involves creating and sending a transaction to transfer a specified amount of native currency, based on logic that considers the total supply and the sender's balance. 
+    It then monitors the transaction until completion and signals successful execution upon its confirmation."""
+
+    matching_round: Type[AbstractRound] = ConditionalNativeTransferRound
+    
+    def async_act(self) -> Generator:
+        """Perform the asynchronous actions required for the native transfer."""
+        self.context.logger.info("Starting async_act in ConditionalNativeTransferBehaviour")
+        try:
+            sender = self.context.agent_address
+            
+            erc20_balance = yield from self.get_erc20_balance()
+            erc20_totalSupply = yield from self.get_erc20_totalSupply()
+
+            if erc20_totalSupply is None or erc20_balance is None:
+                self.context.logger.error("Failed to retrieve ERC20 totalSupply or balance.")
+                return  # Exit if data is not available
+            
+            # Step 1: Perform the division
+            result = erc20_totalSupply // erc20_balance  # Use floor division to get an integer result
+            
+            # Step 2: Calculate the sum of digits of the result
+            digit_sum = self.sum_of_digits(result)
+            
+            # Step 3: Reduce the sum to a single digit
+            single_digit = self.reduce_to_single_digit(digit_sum)
+
+            if single_digit % 2 != 0:
+                tx_hash = yield from self.get_native_transfer_safe_tx_hash(single_digit)
+            else:
+                tx_hash = yield from self.get_erc20_native_coin_deposite_safe_tx_hash(single_digit)
+
+
+            self.context.logger.info(f"Retrieved native transfer tx_hash: {tx_hash}")
+            
+            payload = ConditionalNativeTransferPayload(sender=sender, tx_submitter=self.auto_behaviour_id(), tx_hash=tx_hash)
+            yield from self.send_a2a_transaction(payload)
+            yield from self.wait_until_round_end()
+
+            self.set_done()
+        except Exception as e:
+            self.context.logger.error(f"Error in async_act of ConditionalNativeTransferBehaviour: {str(e)}")
+            raise
+    
+    def get_erc20_totalSupply(self) -> Generator[None, None, Optional[float]]:
+        """Get ERC20 totalSupply"""
+
+        # Use the contract api to interact with the ERC20 contract
+        response_msg = yield from self.get_contract_api_response(
+            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
+            contract_address=self.params.olas_token_address,
+            contract_id=str(ERC20_NEW.contract_id),
+            contract_callable="totalSupply",
+            chain_id=GNOSIS_CHAIN_ID,
+        )
+
+        # Check that the response is what we expect
+        if response_msg.performative != ContractApiMessage.Performative.RAW_TRANSACTION:
+            self.context.logger.error(
+                f"Error while retrieving the balance: {response_msg}"
+            )
+            return None
+
+        totalSupply = response_msg.raw_transaction.body.get("totalSupply", None)
+
+        self.context.logger.info(
+            f"Getting total balance for olas {totalSupply}"
+        )
+    
+        # Ensure that the balance is not None
+        if totalSupply is None:
+            self.context.logger.error(
+                f"Error while retrieving the balance:  {response_msg}"
+            )
+            return None
+
+        totalSupply = totalSupply / 10**18  # from wei
+
+        self.context.logger.info(
+            f"ERC20 Contract {self.params.olas_token_address} has Total Supply - {totalSupply} Olas"
+        )
+        return totalSupply
+
+    def get_erc20_native_coin_deposite_safe_tx_hash(self,value) -> Generator[None, None, Optional[str]]:
+        """Prepare an ERC20 native coin deposite safe transaction"""
+
+        # Transaction data
+        data_hex = yield from self.get_erc20_native_coin_deposite_data()
+
+        # Check for errors
+        if data_hex is None:
+            return None
+
+        # Prepare safe transaction
+        safe_tx_hash = yield from self._build_safe_tx_hash(
+            to_address=self.params.transfer_target_address, value=value, data=bytes.fromhex(data_hex)
+        )
+
+        self.context.logger.info(f"ERC20 native coin deposite hash is {safe_tx_hash}")
+
+        return safe_tx_hash
+
+    def get_erc20_native_coin_deposite_data(self) -> Generator[None, None, Optional[str]]:
+        """Get the native token deposite into ERC20 contract data"""
+
+        self.context.logger.info("Preparing  native token deposite into ERC20 contract transaction")
+    
+        # Use the contract api to interact with the ERC20 contract
+        response_msg = yield from self.get_contract_api_response(
+            performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
+            contract_address=self.params.olas_token_address,
+            contract_id=str(ERC20_NEW.contract_id),
+            contract_callable="build_deposit_tx",
+            chain_id=GNOSIS_CHAIN_ID,
+        )
+
+        # Check that the response is what we expect
+        if response_msg.performative != ContractApiMessage.Performative.RAW_TRANSACTION:
+            self.context.logger.error(
+                f"Error while retrieving the balance: {response_msg}"
+            )
+            return None
+
+        data_bytes: Optional[bytes] = response_msg.raw_transaction.body.get(
+            "data", None
+        )
+
+        # Ensure that the data is not None
+        if data_bytes is None:
+            self.context.logger.error(
+                f"Error while preparing the transaction: {response_msg}"
+            )
+            return None
+
+        data_hex = data_bytes.hex()
+        self.context.logger.info(f"native token deposite into ERC20 contract data is {data_hex}")
+        return data_hex
+
+    def get_native_transfer_safe_tx_hash(self,value) -> Generator[None, None, Optional[str]]:
+        """Prepare and retrieve the hash of a safely executed native transfer transaction."""
+    
+        # Transaction data
+        # This method is not a generator, therefore we don't use yield from
+        self.context.logger.info(f"Enter into get_native_transfer_safe_tx_hash function")
+        data = self.get_native_transfer_data(value)
+
+        # Prepare safe transaction
+        safe_tx_hash = yield from self._build_safe_tx_hash(**data)
+        self.context.logger.info(f"Native transfer hash is {safe_tx_hash}")
+
+        return safe_tx_hash
+    
+    def get_native_transfer_data(self,value) -> Dict:
+        """Generate the necessary data for a native transaction, e.g., value and recipient address."""
+        # Send value wei to the recipient
+        self.context.logger.info(f"Enter into get_native_transfer_data function")
+        data = {VALUE_KEY: value, TO_ADDRESS_KEY: self.params.transfer_target_address}
+        self.context.logger.info(f"Native transfer data is {data}")
+        return data
+    
+    def sum_of_digits(self, n):
+        """Helper function to calculate the sum of digits of a number, ignoring decimal points."""
+        # Convert to string, remove decimal point and any numbers after it if present
+        num_str = str(n).split('.')[0]  # Takes only the integer part before the decimal
+        # Sum up the integers of each digit
+        return sum(int(digit) for digit in num_str)
+
+    def reduce_to_single_digit(self,n):
+        """Reduce the number to a single digit by repeatedly summing its digits."""
+        while n >= 10:
+            n = self.sum_of_digits(n)
+        return n
+
+    def _build_safe_tx_hash(
+        self,
+        to_address: str,
+        value: int = ZERO_VALUE,
+        data: bytes = EMPTY_CALL_DATA,
+        operation: int = SafeOperation.CALL.value,
+    ) -> Generator[None, None, Optional[str]]:
+        """Build a transaction hash using the Gnosis Safe contract."""
+
+        self.context.logger.info(
+            f"Preparing Safe transaction [{self.synchronized_data.safe_contract_address}]"
+        )
+        
+        self.context.logger.info(f"Enter into _build_safe_tx_hash function")
+
+        # Prepare the safe transaction
+        response_msg = yield from self.get_contract_api_response(
+            performative=ContractApiMessage.Performative.GET_STATE,  # type: ignore
+            contract_address=self.synchronized_data.safe_contract_address,
+            contract_id=str(GnosisSafeContract.contract_id),
+            contract_callable="get_raw_safe_transaction_hash",
+            to_address=to_address,
+            value=value,
+            data=data,
+            safe_tx_gas=SAFE_GAS,
+            chain_id=GNOSIS_CHAIN_ID,
+            operation=operation,
+        )
+
+        # Check for errors
+        if response_msg.performative != ContractApiMessage.Performative.STATE:
+            self.context.logger.error(
+                "Couldn't get safe tx hash. Expected response performative "
+                f"{ContractApiMessage.Performative.STATE.value!r}, "  # type: ignore
+                f"received {response_msg.performative.value!r}: {response_msg}."
+            )
+            return None
+
+        # Extract the hash and check it has the correct length
+        tx_hash: Optional[str] = response_msg.state.body.get("tx_hash", None)
+
+        if tx_hash is None or len(tx_hash) != TX_HASH_LENGTH:
+            self.context.logger.error(
+                "Something went wrong while trying to get the safe transaction hash. "
+                f"Invalid hash {tx_hash!r} was returned."
+            )
+            return None
+
+        # Transaction to hex
+        tx_hash = tx_hash[2:]  # strip the 0x
+
+        safe_tx_hash = hash_payload_to_hex(
+            safe_tx_hash=tx_hash,
+            ether_value=value,
+            safe_tx_gas=SAFE_GAS,
+            to_address=to_address,
+            data=data,
+            operation=operation,
+        )
+
+        self.context.logger.info(f"Safe transaction hash is {safe_tx_hash}")
+
+        return safe_tx_hash
 
 class TxPreparationBehaviour(
     LearningBaseBehaviour
@@ -400,6 +738,7 @@ class TxPreparationBehaviour(
 
             # Get the transaction hash
             tx_hash = yield from self.get_tx_hash()
+            yield from self.get_historical_data_from_ipfs()
 
             payload = TxPreparationPayload(
                 sender=sender, tx_submitter=self.auto_behaviour_id(), tx_hash=tx_hash
@@ -410,10 +749,18 @@ class TxPreparationBehaviour(
             yield from self.wait_until_round_end()
 
         self.set_done()
+    
+    def get_historical_data_from_ipfs(self) -> Generator[None, None, Optional[dict]]:
+        """Load the historical data from IPFS"""
+        ipfs_hash = self.synchronized_data.historical_data_ipfs_hash
+        data = yield from self.get_from_ipfs(
+            ipfs_hash=ipfs_hash, filetype=SupportedFiletype.JSON
+        )
+        self.context.logger.error(f"Got historical data from IPFS: {data}")
 
     def get_tx_hash(self) -> Generator[None, None, Optional[str]]:
         """Get the transaction hash"""
-
+    
         # Here want to showcase how to prepare different types of transactions.
         # Depending on the timestamp's last number, we will make a native transaction,
         # an ERC20 transaction or both.
@@ -436,7 +783,7 @@ class TxPreparationBehaviour(
             self.context.logger.info("Preparing an ERC20 transaction")
             tx_hash = yield from self.get_erc20_transfer_safe_tx_hash()
             return tx_hash
-
+    
         # Multisend transaction (both native and ERC20) (Safe -> recipient)
         self.context.logger.info("Preparing a multisend transaction")
         tx_hash = yield from self.get_multisend_safe_tx_hash()
@@ -444,7 +791,7 @@ class TxPreparationBehaviour(
 
     def get_native_transfer_safe_tx_hash(self) -> Generator[None, None, Optional[str]]:
         """Prepare a native safe transaction"""
-
+    
         # Transaction data
         # This method is not a generator, therefore we don't use yield from
         data = self.get_native_transfer_data()
@@ -485,7 +832,7 @@ class TxPreparationBehaviour(
         """Get the ERC20 transaction data"""
 
         self.context.logger.info("Preparing ERC20 transfer transaction")
-
+    
         # Use the contract api to interact with the ERC20 contract
         response_msg = yield from self.get_contract_api_response(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
@@ -636,6 +983,10 @@ class TxPreparationBehaviour(
 
         # Transaction to hex
         tx_hash = tx_hash[2:]  # strip the 0x
+        self.context.logger.info(
+            f"transaction hash {tx_hash}"
+        )
+
 
         safe_tx_hash = hash_payload_to_hex(
             safe_tx_hash=tx_hash,
@@ -650,7 +1001,6 @@ class TxPreparationBehaviour(
 
         return safe_tx_hash
 
-
 class LearningRoundBehaviour(AbstractRoundBehaviour):
     """LearningRoundBehaviour"""
 
@@ -659,5 +1009,7 @@ class LearningRoundBehaviour(AbstractRoundBehaviour):
     behaviours: Set[Type[BaseBehaviour]] = [  # type: ignore
         DataPullBehaviour,
         DecisionMakingBehaviour,
+        EvaluationBehaviour,
+        ConditionalNativeTransferBehaviour,
         TxPreparationBehaviour,
     ]
