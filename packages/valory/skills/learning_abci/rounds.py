@@ -132,7 +132,7 @@ class DataPullRound(CollectSameUntilThresholdRound):
 
     # Collection key specifies where in the synchronized data the agento to payload mapping will be stored
     collection_key = get_name(SynchronizedData.participant_to_data_round)
-
+    
     # Selection key specifies how to extract all the different objects from each agent's payload
     # and where to store it in the synchronized data. Notice that the order follows the same order
     # from the payload class.
@@ -157,18 +157,13 @@ class DecisionMakingRound(CollectSameUntilThresholdRound):
     def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Event]]:
         """Process the end of the block."""
 
-        if self.threshold_reached:
-            event = Event(self.most_voted_payload)
-            return self.synchronized_data, event
+        return self.synchronized_data, Event.DONE
 
-        if not self.is_majority_possible(
-            self.collection, self.synchronized_data.nb_participants
-        ):
-            return self.synchronized_data, Event.NO_MAJORITY
-
-        return None
+       
 
     # Event.DONE, Event.ERROR, Event.TRANSACT, Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
+
+
 
 class EvaluationRound(CollectSameUntilThresholdRound):
     """

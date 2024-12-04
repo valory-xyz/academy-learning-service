@@ -82,7 +82,6 @@ VALUE_KEY = "value"
 TO_ADDRESS_KEY = "to_address"
 METADATA_FILENAME = "metadata.json"
 
-
 class LearningBaseBehaviour(BaseBehaviour, ABC):  # pylint: disable=too-many-ancestors
     """Base behaviour for the learning_abci behaviours."""
 

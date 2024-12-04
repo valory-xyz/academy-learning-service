@@ -27,6 +27,7 @@ states:
 - DataPullRound
 - CheckLateTxHashesRound
 - ConditionalNativeTransferRound
+- ContractDataReadRound
 - CheckTransactionHistoryRound
 - CollectSignatureRound
 - DecisionMakingRound
@@ -54,7 +55,7 @@ transition_func:
     (CheckLateTxHashesRound, NONE): RandomnessTransactionSubmissionRound
     (CheckLateTxHashesRound, NO_MAJORITY): RandomnessTransactionSubmissionRound
     (ConditionalNativeTransferRound, DONE): TxPreparationRound
-    (ConditionalNativeTransferRound, ERROR): FinishedDecisionMakingRound
+    (ConditionalNativeTransferRound, ERROR): ContractDataReadRound
     (ConditionalNativeTransferRound, NO_MAJORITY): ConditionalNativeTransferRound
     (ConditionalNativeTransferRound, ROUND_TIMEOUT): ConditionalNativeTransferRound
     (ConditionalNativeTransferRound, TRANSACT): RandomnessTransactionSubmissionRound
@@ -64,16 +65,20 @@ transition_func:
     (CheckTransactionHistoryRound, NEGATIVE): SelectKeeperTransactionSubmissionBRound
     (CheckTransactionHistoryRound, NONE): RandomnessTransactionSubmissionRound
     (CheckTransactionHistoryRound, NO_MAJORITY): CheckTransactionHistoryRound
+    (ContractDataReadRound, DONE): ResetAndPauseRound
+    (ContractDataReadRound, NO_MAJORITY): ContractDataReadRound
+    (ContractDataReadRound, ROUND_TIMEOUT): ContractDataReadRound
+    (ContractDataReadRound, ERROR): ContractDataReadRound
     (CollectSignatureRound, DONE): FinalizationRound
     (CollectSignatureRound, NO_MAJORITY): ResetRound
     (CollectSignatureRound, ROUND_TIMEOUT): CollectSignatureRound
-    (DecisionMakingRound, DONE): ResetAndPauseRound
-    (DecisionMakingRound, ERROR): ResetAndPauseRound
+    (DecisionMakingRound, DONE): ContractDataReadRound
+    (DecisionMakingRound, ERROR): ContractDataReadRound
     (DecisionMakingRound, NO_MAJORITY): DecisionMakingRound
     (DecisionMakingRound, ROUND_TIMEOUT): DecisionMakingRound
     (DecisionMakingRound, TRANSACT): EvaluationRound
     (EvaluationRound, DONE): ConditionalNativeTransferRound
-    (EvaluationRound, ERROR): EvaluationRound
+    (EvaluationRound, ERROR): ContractDataReadRound
     (EvaluationRound, NO_MAJORITY): EvaluationRound
     (EvaluationRound, ROUND_TIMEOUT): EvaluationRound
     (FinalizationRound, CHECK_HISTORY): CheckTransactionHistoryRound
