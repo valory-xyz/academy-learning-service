@@ -7,18 +7,19 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeiho3lkochqpmes4f235chq26oggmwnol3vjuvhosleoubbjirbwaq
-  behaviours.py: bafybeiaiy6sh7aqo4zzghnejv55vs43vqtpaipj5cpabx32qdjrqleeeie
+  behaviours.py: bafybeiaoxum5j2emyokwbumh2pu4jglu2ykliwuzpbhesku7ozltmdqocm
   dialogues.py: bafybeifqjbumctlffx2xvpga2kcenezhe47qhksvgmaylyp5ypwqgfar5u
-  fsm_specification.yaml: bafybeigbbydxuqephdpatb3fp3sxnvr77bfvvo5hwjimxfpgyl32wupe64
-  handlers.py: bafybeigjadr4thz6hfpfx5abezbwnqhbxmachf4efasrn4z2vqhsqgnyvi
-  models.py: bafybeicreffhurci7jzpwvxnlo5z3a2j3vcfgkopg2gtwwxfrncbzk77ra
-  payloads.py: bafybeidc6qqnfvd7qovjatt2i2kbga7pj6epdghlzqxdhzx6b6j6p7ubvm
-  rounds.py: bafybeibcxdou2opzsof4fcnaijfdgzpaaggmucyolhegns3k4zpzvuom2i
+  fsm_specification.yaml: bafybeidwmjmfzrq6nb5xh4aomceebuccfrmp5loa4res5jb6kb6plvg3ha
+  handlers.py: bafybeigbr7rxpjgwcz3lbvudmoelndgriecp5iewjxm4icwl2yxyhael7u
+  models.py: bafybeic762skwe2zv4awqxhl5rnlnv2vxsw5vefwg5neq6xvbkzv5ethwi
+  payloads.py: bafybeicfcnktmwul7pmnfce3ghxi3cu6tbvpk3vuvckrf7gjglxe6lv2km
+  rounds.py: bafybeieakcmjljzvynt2atzsjkqfltbhbu3ch23zrpaf5pvbaqnx2vaxpi
 fingerprint_ignore_patterns: []
 connections: []
 contracts:
 - valory/gnosis_safe:0.1.0:bafybeib375xmvcplw7ageic2np3hq4yqeijrvd5kl7rrdnyvswats6ngmm
-- valory/erc20:0.1.0:bafybeibyhuxozkkvsymqz45vxixr3w3bs4vsvxg2nsx5jlyi3f3hhn7ezi
+- valory/erc20:0.1.0:bafybeie7n4azsbr6i3wlovh5f3qmke6eh4l6zpualde2k2eej4imfyjtjm
+- valory/erc20_new:0.1.0:bafybeiey3hwc2rf4z3jx6r4jrjib75mqe4evnrzz7kfqg2lt5e22p24gwm
 - valory/multisend:0.1.0:bafybeig5byt5urg2d2bsecufxe5ql7f4mezg3mekfleeh32nmuusx66p4y
 protocols:
 - valory/contract_api:1.0.0:bafybeidgu7o5llh26xp3u3ebq3yluull5lupiyeu6iooi2xyymdrgnzq5i
@@ -147,6 +148,20 @@ models:
       retries: 5
       url: https://api.coingecko.com/api/v3/simple/price
     class_name: CoingeckoSpecs
+  coingecko_pricehistorydata_specs:
+    args:
+      api_id: coingecko
+      headers:
+        Accept: application/json
+      method: GET
+      parameters:
+        vs_currency: usd
+        days: 1
+      response_key: prices
+      response_type: list
+      retries: 5
+      url: https://api.coingecko.com/api/v3/coins/autonolas/market_chart
+    class_name: Coingeckopricehistorydataspecs
   requests:
     args: {}
     class_name: Requests
