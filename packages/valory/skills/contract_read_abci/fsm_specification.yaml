@@ -1,0 +1,19 @@
+alphabet_in:
+- DONE
+- ERROR
+- NO_MAJORITY
+- ROUND_TIMEOUT
+default_start_state: ContractDataReadRound
+final_states:
+- FinishedContractDataReadRound
+label: ContractReadAbciApp
+start_states:
+- ContractDataReadRound
+states:
+- ContractDataReadRound
+- FinishedContractDataReadRound
+transition_func:
+    (ContractDataReadRound, DONE): FinishedContractDataReadRound
+    (ContractDataReadRound, NO_MAJORITY): ContractDataReadRound
+    (ContractDataReadRound, ROUND_TIMEOUT): ContractDataReadRound
+    (ContractDataReadRound, ERROR): ContractDataReadRound

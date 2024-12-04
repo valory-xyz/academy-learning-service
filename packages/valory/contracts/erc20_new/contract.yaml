@@ -1,4 +1,4 @@
-name: erc20
+name: erc20_new
 author: valory
 version: 0.1.0
 type: contract
@@ -8,13 +8,13 @@ aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeifmfma6rglvpa22odtozyosnp5mwljum64utxip2wgmezuhnjjjyi
   __init__.py: bafybeif5vpc3dfrlxlch7brbhmdwksabyzddpfqgm56vdbbkek3t3br6ke
-  build/ERC20.json: bafybeiemn5b5nszuss7xj6lmvmjuendltp6wz7ubihdvd7c6wqw4bohbpa
-  contract.py: bafybeigbsyiugfcamtu2meur4rtalc6zbzmacic5br2qny4gsx7yom2bbe
+  build/ERC20_NEW.json: bafybeiemn5b5nszuss7xj6lmvmjuendltp6wz7ubihdvd7c6wqw4bohbpa
+  contract.py: bafybeiggmyeeecjf65edav5nj2tatcn5vsdcuoef6yigml5wlxz34ph52q
 fingerprint_ignore_patterns: []
 contracts: []
-class_name: ERC20
+class_name: ERC20_NEW
 contract_interface_paths:
-  ethereum: build/ERC20.json
+  ethereum: build/ERC20_NEW.json
 dependencies:
   ecdsa:
     version: '>=0.15'

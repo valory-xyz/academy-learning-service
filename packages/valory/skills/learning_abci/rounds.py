@@ -35,8 +35,10 @@ from packages.valory.skills.abstract_round_abci.base import (
     get_name,
 )
 from packages.valory.skills.learning_abci.payloads import (
+    ConditionalNativeTransferPayload,
     DataPullPayload,
     DecisionMakingPayload,
+    EvaluationPayload,
     TxPreparationPayload,
 )
 
@@ -87,6 +89,22 @@ class SynchronizedData(BaseSynchronizedData):
     def participant_to_data_round(self) -> DeserializedCollection:
         """Agent to payload mapping for the DataPullRound."""
         return self._get_deserialized("participant_to_data_round")
+    
+    @property
+    def historical_data_ipfs_hash(self) -> Optional[str]:
+        """Get the IPFS hash of historical data."""
+        return self.db.get("historical_data_ipfs_hash", None)
+    
+    @property
+    def comparison_data(self) -> bool:
+        """Get the comparison result of current vs. historical prices."""
+        return self.db.get("comparison_data", None)
+    
+    @property
+    def participant_to_evaluation_round(self) -> DeserializedCollection:
+        """Agent to payload mapping for the DataPullRound."""
+        return self._get_deserialized("participant_to_evaluation_round")
+    
 
     @property
     def most_voted_tx_hash(self) -> Optional[float]:
@@ -114,7 +132,7 @@ class DataPullRound(CollectSameUntilThresholdRound):
 
     # Collection key specifies where in the synchronized data the agento to payload mapping will be stored
     collection_key = get_name(SynchronizedData.participant_to_data_round)
-
+    
     # Selection key specifies how to extract all the different objects from each agent's payload
     # and where to store it in the synchronized data. Notice that the order follows the same order
     # from the payload class.
@@ -139,18 +157,53 @@ class DecisionMakingRound(CollectSameUntilThresholdRound):
     def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Event]]:
         """Process the end of the block."""
 
-        if self.threshold_reached:
-            event = Event(self.most_voted_payload)
-            return self.synchronized_data, event
+        return self.synchronized_data, Event.DONE
 
-        if not self.is_majority_possible(
-            self.collection, self.synchronized_data.nb_participants
-        ):
-            return self.synchronized_data, Event.NO_MAJORITY
-
-        return None
+       
 
     # Event.DONE, Event.ERROR, Event.TRANSACT, Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
+
+
+
+class EvaluationRound(CollectSameUntilThresholdRound):
+    """
+    EvaluationRound is designed to compare current and historical prices, an essential step in scenarios
+    where decisions are based on market trends. This round involves agents reaching a consensus on the 
+    current price and comparing it to previously synchronized historical prices to assess market conditions.
+    """
+
+    payload_class = EvaluationPayload  
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    error_event = Event.ERROR
+    no_majority_event = Event.NO_MAJORITY
+
+    # Adjust the collection key to use the appropriate collection for this round
+    collection_key = get_name(SynchronizedData.participant_to_evaluation_round)  # Adjusted
+    
+    # Selection key should map directly to the payload data correctly
+    selection_key = (
+        get_name(SynchronizedData.historical_data_ipfs_hash),
+        get_name(SynchronizedData.comparison_data),
+    )
+
+class ConditionalNativeTransferRound(CollectSameUntilThresholdRound):
+    """Defines the round behavior for executing a conditional native transfer with a consensus mechanism.
+
+    This round aims to achieve consensus on a transaction hash before proceeding with the actual transaction.
+    """
+
+    payload_class = ConditionalNativeTransferPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.TRANSACT
+    no_majority_event = Event.NO_MAJORITY
+    collection_key = get_name(SynchronizedData.participant_to_tx_round)
+    selection_key = (
+        get_name(SynchronizedData.tx_submitter),
+        get_name(SynchronizedData.most_voted_tx_hash),
+    )
+
+    # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
 
 class TxPreparationRound(CollectSameUntilThresholdRound):
@@ -195,7 +248,20 @@ class LearningAbciApp(AbciApp[Event]):
             Event.ROUND_TIMEOUT: DecisionMakingRound,
             Event.DONE: FinishedDecisionMakingRound,
             Event.ERROR: FinishedDecisionMakingRound,
-            Event.TRANSACT: TxPreparationRound,
+            Event.TRANSACT: EvaluationRound,
+        },
+        EvaluationRound: {
+            Event.NO_MAJORITY: EvaluationRound,
+            Event.ROUND_TIMEOUT: EvaluationRound,
+            Event.DONE: ConditionalNativeTransferRound,
+            Event.ERROR: FinishedDecisionMakingRound,
+        },
+        ConditionalNativeTransferRound: {
+            Event.NO_MAJORITY: ConditionalNativeTransferRound,
+            Event.ROUND_TIMEOUT: ConditionalNativeTransferRound,
+            Event.DONE: TxPreparationRound,
+            Event.ERROR: FinishedDecisionMakingRound,
+            Event.TRANSACT: FinishedTxPreparationRound,
         },
         TxPreparationRound: {
             Event.NO_MAJORITY: TxPreparationRound,

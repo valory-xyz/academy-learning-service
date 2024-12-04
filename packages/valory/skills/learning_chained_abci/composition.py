@@ -20,6 +20,7 @@
 """This package contains round behaviours of LearningChainedSkillAbciApp."""
 
 import packages.valory.skills.learning_abci.rounds as LearningAbci
+import packages.valory.skills.contract_read_abci.rounds as ContractReadAbci
 import packages.valory.skills.registration_abci.rounds as RegistrationAbci
 import packages.valory.skills.reset_pause_abci.rounds as ResetAndPauseAbci
 import packages.valory.skills.transaction_settlement_abci.rounds as TxSettlementAbci
@@ -37,7 +38,8 @@ from packages.valory.skills.termination_abci.rounds import (
 
 abci_app_transition_mapping: AbciAppTransitionMapping = {
     RegistrationAbci.FinishedRegistrationRound: LearningAbci.DataPullRound,
-    LearningAbci.FinishedDecisionMakingRound: ResetAndPauseAbci.ResetAndPauseRound,
+    LearningAbci.FinishedDecisionMakingRound: ContractReadAbci.ContractDataReadRound,
+    ContractReadAbci.FinishedContractDataReadRound: ResetAndPauseAbci.ResetAndPauseRound,
     LearningAbci.FinishedTxPreparationRound: TxSettlementAbci.RandomnessTransactionSubmissionRound,
     TxSettlementAbci.FinishedTransactionSubmissionRound: ResetAndPauseAbci.ResetAndPauseRound,
     TxSettlementAbci.FailedRound: TxSettlementAbci.RandomnessTransactionSubmissionRound,
@@ -55,6 +57,7 @@ LearningChainedSkillAbciApp = chain(
     (
         RegistrationAbci.AgentRegistrationAbciApp,
         LearningAbci.LearningAbciApp,
+        ContractReadAbci.ContractReadAbciApp,
         TxSettlementAbci.TransactionSubmissionAbciApp,
         ResetAndPauseAbci.ResetPauseAbciApp,
     ),

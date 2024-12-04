@@ -43,6 +43,9 @@ from packages.valory.skills.termination_abci.behaviours import (
 from packages.valory.skills.transaction_settlement_abci.behaviours import (
     TransactionSettlementRoundBehaviour,
 )
+from packages.valory.skills.contract_read_abci.behaviours import (
+    ContractReadRoundBehaviour,
+)
 
 
 class LearningChainedConsensusBehaviour(AbstractRoundBehaviour):
@@ -56,5 +59,6 @@ class LearningChainedConsensusBehaviour(AbstractRoundBehaviour):
         *TransactionSettlementRoundBehaviour.behaviours,
         *TerminationAbciBehaviours.behaviours,
         *LearningRoundBehaviour.behaviours,
+        *ContractReadRoundBehaviour.behaviours,
     }
     background_behaviours_cls = {BackgroundBehaviour}

@@ -27,7 +27,7 @@ from packages.valory.skills.abstract_round_abci.tests.data.dummy_abci.models imp
     RandomnessApi as BaseRandomnessApi,
 )
 from packages.valory.skills.learning_abci.models import (
-    CoingeckoSpecs as BaseCoingeckoSpecs,
+    CoingeckoSpecs,Coingeckopricehistorydataspecs as BaseCoingeckoSpecs,
 )
 from packages.valory.skills.learning_abci.models import Params as LearningParams
 from packages.valory.skills.learning_abci.models import SharedState as BaseSharedState
@@ -38,6 +38,11 @@ from packages.valory.skills.learning_chained_abci.composition import (
 from packages.valory.skills.reset_pause_abci.rounds import Event as ResetPauseEvent
 from packages.valory.skills.termination_abci.models import TerminationParams
 
+from packages.valory.skills.contract_read_abci.models import Params as ContractParams
+
+from packages.valory.skills.contract_read_abci.models import (
+    Coingeckopricehistorydataspecs as ContractBaseCoingeckoSpecs,
+)
 
 Requests = BaseRequests
 BenchmarkTool = BaseBenchmarkTool
@@ -73,9 +78,14 @@ class SharedState(BaseSharedState):
 class Params(  # pylint: disable=too-many-ancestors
     LearningParams,
     TerminationParams,
+    ContractParams,
 ):
     """A model to represent params for multiple abci apps."""
 
 
 class CoingeckoSpecs(BaseCoingeckoSpecs):
     """A model that wraps ApiSpecs for Coingecko API."""
+
+class Coingeckopricehistorydataspecs(BaseCoingeckoSpecs,ContractBaseCoingeckoSpecs):
+    """A model that wraps ApiSpecs for Coingecko API."""
+

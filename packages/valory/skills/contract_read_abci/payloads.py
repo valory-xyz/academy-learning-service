@@ -26,39 +26,9 @@ from packages.valory.skills.abstract_round_abci.base import BaseTxPayload
 
 
 @dataclass(frozen=True)
-class DataPullPayload(BaseTxPayload):
+class ContractDataReadPayload(BaseTxPayload):
     """Represent a transaction payload for the DataPullRound."""
-
-    price: Optional[float]
-    price_ipfs_hash: Optional[str]
-    native_balance: Optional[float]
-    erc20_balance: Optional[float]
-
-
-@dataclass(frozen=True)
-class DecisionMakingPayload(BaseTxPayload):
-    """Represent a transaction payload for the DecisionMakingRound."""
-
+    
     event: str
 
 
-@dataclass(frozen=True)
-class EvaluationPayload(BaseTxPayload):
-    """Represent a transaction payload for the EvaluationRound."""
-
-    historical_data_ipfs_hash: Optional[str] = field(default=None)
-    comparison_data: bool = field(default=False)
-
-@dataclass(frozen=True)
-class ConditionalNativeTransferPayload(BaseTxPayload):
-    """Represent a transaction payload for the ConditionalNativeTransferPayload."""
-
-    tx_submitter: Optional[str] = None
-    tx_hash: Optional[str] = None
-
-@dataclass(frozen=True)
-class TxPreparationPayload(BaseTxPayload):
-    """Represent a transaction payload for the TxPreparationRound."""
-
-    tx_submitter: Optional[str] = None
-    tx_hash: Optional[str] = None

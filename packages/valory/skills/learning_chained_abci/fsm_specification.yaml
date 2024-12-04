@@ -26,9 +26,12 @@ start_states:
 states:
 - DataPullRound
 - CheckLateTxHashesRound
+- ConditionalNativeTransferRound
+- ContractDataReadRound
 - CheckTransactionHistoryRound
 - CollectSignatureRound
 - DecisionMakingRound
+- EvaluationRound
 - FinalizationRound
 - RandomnessTransactionSubmissionRound
 - RegistrationRound
@@ -51,20 +54,33 @@ transition_func:
     (CheckLateTxHashesRound, NEGATIVE): RandomnessTransactionSubmissionRound
     (CheckLateTxHashesRound, NONE): RandomnessTransactionSubmissionRound
     (CheckLateTxHashesRound, NO_MAJORITY): RandomnessTransactionSubmissionRound
+    (ConditionalNativeTransferRound, DONE): TxPreparationRound
+    (ConditionalNativeTransferRound, ERROR): ContractDataReadRound
+    (ConditionalNativeTransferRound, NO_MAJORITY): ConditionalNativeTransferRound
+    (ConditionalNativeTransferRound, ROUND_TIMEOUT): ConditionalNativeTransferRound
+    (ConditionalNativeTransferRound, TRANSACT): RandomnessTransactionSubmissionRound
     (CheckTransactionHistoryRound, CHECK_LATE_ARRIVING_MESSAGE): SynchronizeLateMessagesRound
     (CheckTransactionHistoryRound, CHECK_TIMEOUT): CheckTransactionHistoryRound
     (CheckTransactionHistoryRound, DONE): ResetAndPauseRound
     (CheckTransactionHistoryRound, NEGATIVE): SelectKeeperTransactionSubmissionBRound
     (CheckTransactionHistoryRound, NONE): RandomnessTransactionSubmissionRound
     (CheckTransactionHistoryRound, NO_MAJORITY): CheckTransactionHistoryRound
+    (ContractDataReadRound, DONE): ResetAndPauseRound
+    (ContractDataReadRound, NO_MAJORITY): ContractDataReadRound
+    (ContractDataReadRound, ROUND_TIMEOUT): ContractDataReadRound
+    (ContractDataReadRound, ERROR): ContractDataReadRound
     (CollectSignatureRound, DONE): FinalizationRound
     (CollectSignatureRound, NO_MAJORITY): ResetRound
     (CollectSignatureRound, ROUND_TIMEOUT): CollectSignatureRound
-    (DecisionMakingRound, DONE): ResetAndPauseRound
-    (DecisionMakingRound, ERROR): ResetAndPauseRound
+    (DecisionMakingRound, DONE): ContractDataReadRound
+    (DecisionMakingRound, ERROR): ContractDataReadRound
     (DecisionMakingRound, NO_MAJORITY): DecisionMakingRound
     (DecisionMakingRound, ROUND_TIMEOUT): DecisionMakingRound
-    (DecisionMakingRound, TRANSACT): TxPreparationRound
+    (DecisionMakingRound, TRANSACT): EvaluationRound
+    (EvaluationRound, DONE): ConditionalNativeTransferRound
+    (EvaluationRound, ERROR): ContractDataReadRound
+    (EvaluationRound, NO_MAJORITY): EvaluationRound
+    (EvaluationRound, ROUND_TIMEOUT): EvaluationRound
     (FinalizationRound, CHECK_HISTORY): CheckTransactionHistoryRound
     (FinalizationRound, CHECK_LATE_ARRIVING_MESSAGE): SynchronizeLateMessagesRound
     (FinalizationRound, DONE): ValidateTransactionRound
