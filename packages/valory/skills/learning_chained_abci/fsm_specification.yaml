@@ -54,7 +54,7 @@ transition_func:
     (CheckLateTxHashesRound, NONE): RandomnessTransactionSubmissionRound
     (CheckLateTxHashesRound, NO_MAJORITY): RandomnessTransactionSubmissionRound
     (ConditionalNativeTransferRound, DONE): TxPreparationRound
-    (ConditionalNativeTransferRound, ERROR): FinishedDecisionMakingRound
+    (ConditionalNativeTransferRound, ERROR): ResetAndPauseRound
     (ConditionalNativeTransferRound, NO_MAJORITY): ConditionalNativeTransferRound
     (ConditionalNativeTransferRound, ROUND_TIMEOUT): ConditionalNativeTransferRound
     (ConditionalNativeTransferRound, TRANSACT): RandomnessTransactionSubmissionRound
@@ -73,7 +73,7 @@ transition_func:
     (DecisionMakingRound, ROUND_TIMEOUT): DecisionMakingRound
     (DecisionMakingRound, TRANSACT): EvaluationRound
     (EvaluationRound, DONE): ConditionalNativeTransferRound
-    (EvaluationRound, ERROR): EvaluationRound
+    (EvaluationRound, ERROR): ResetAndPauseRound
     (EvaluationRound, NO_MAJORITY): EvaluationRound
     (EvaluationRound, ROUND_TIMEOUT): EvaluationRound
     (FinalizationRound, CHECK_HISTORY): CheckTransactionHistoryRound
