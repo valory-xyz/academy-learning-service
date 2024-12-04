@@ -23,6 +23,7 @@ packages/valory/skills/*
 !packages/valory/skills/contract_read_abci
 !packages/valory/skills/learning_chained_abci
 !packages/valory/contracts/erc20
+!packages/valory/contracts/erc20_new
 
 leak_report
 /Pipfile.lock
