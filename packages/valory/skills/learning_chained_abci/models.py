@@ -27,7 +27,7 @@ from packages.valory.skills.abstract_round_abci.tests.data.dummy_abci.models imp
     RandomnessApi as BaseRandomnessApi,
 )
 from packages.valory.skills.learning_abci.models import (
-    CoingeckoSpecs as BaseCoingeckoSpecs,
+    CoingeckoSpecs,Coingeckopricehistorydataspecs as BaseCoingeckoSpecs,
 )
 from packages.valory.skills.learning_abci.models import Params as LearningParams
 from packages.valory.skills.learning_abci.models import SharedState as BaseSharedState
@@ -79,3 +79,7 @@ class Params(  # pylint: disable=too-many-ancestors
 
 class CoingeckoSpecs(BaseCoingeckoSpecs):
     """A model that wraps ApiSpecs for Coingecko API."""
+
+class Coingeckopricehistorydataspecs(BaseCoingeckoSpecs):
+    """A model that wraps ApiSpecs for Coingecko API."""
+

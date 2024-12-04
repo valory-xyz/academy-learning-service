@@ -19,7 +19,7 @@
 
 """This module contains the transaction payloads of the LearningAbciApp."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass,field
 from typing import Optional
 
 from packages.valory.skills.abstract_round_abci.base import BaseTxPayload
@@ -41,6 +41,20 @@ class DecisionMakingPayload(BaseTxPayload):
 
     event: str
 
+
+@dataclass(frozen=True)
+class EvaluationPayload(BaseTxPayload):
+    """Represent a transaction payload for the EvaluationRound."""
+
+    historical_data_ipfs_hash: Optional[str] = field(default=None)
+    comparison_data: bool = field(default=False)
+
+@dataclass(frozen=True)
+class ConditionalNativeTransferPayload(BaseTxPayload):
+    """Represent a transaction payload for the ConditionalNativeTransferPayload."""
+
+    tx_submitter: Optional[str] = None
+    tx_hash: Optional[str] = None
 
 @dataclass(frozen=True)
 class TxPreparationPayload(BaseTxPayload):
