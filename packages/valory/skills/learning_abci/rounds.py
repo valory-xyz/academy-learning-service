@@ -37,6 +37,7 @@ from packages.valory.skills.abstract_round_abci.base import (
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
     DecisionMakingPayload,
+    EvaluationPayload,
     TxPreparationPayload,
 )
 
@@ -87,6 +88,17 @@ class SynchronizedData(BaseSynchronizedData):
     def participant_to_data_round(self) -> DeserializedCollection:
         """Agent to payload mapping for the DataPullRound."""
         return self._get_deserialized("participant_to_data_round")
+    
+    @property
+    def comparison_data(self) -> bool:
+        """Get the comparison result of current vs. historical prices."""
+        return self.db.get("comparison_data", None)
+    
+    @property
+    def participant_to_evaluation_round(self) -> DeserializedCollection:
+        """Agent to payload mapping for the DataPullRound."""
+        return self._get_deserialized("participant_to_evaluation_round")
+    
 
     @property
     def most_voted_tx_hash(self) -> Optional[float]:
@@ -152,6 +164,27 @@ class DecisionMakingRound(CollectSameUntilThresholdRound):
 
     # Event.DONE, Event.ERROR, Event.TRANSACT, Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
+class EvaluationRound(CollectSameUntilThresholdRound):
+    """
+    EvaluationRound is designed to compare current and historical prices, an essential step in scenarios
+    where decisions are based on market trends. This round involves agents reaching a consensus on the 
+    current price and comparing it to previously synchronized historical prices to assess market conditions.
+    """
+
+    payload_class = EvaluationPayload  
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
+    error_event = Event.ERROR
+    no_majority_event = Event.NO_MAJORITY
+
+    # Adjust the collection key to use the appropriate collection for this round
+    collection_key = get_name(SynchronizedData.participant_to_evaluation_round)  # Adjusted
+    
+    # Selection key should map directly to the payload data correctly
+    selection_key = (
+        get_name(SynchronizedData.comparison_data),
+    )
+
 
 class TxPreparationRound(CollectSameUntilThresholdRound):
     """TxPreparationRound"""
@@ -195,7 +228,13 @@ class LearningAbciApp(AbciApp[Event]):
             Event.ROUND_TIMEOUT: DecisionMakingRound,
             Event.DONE: FinishedDecisionMakingRound,
             Event.ERROR: FinishedDecisionMakingRound,
-            Event.TRANSACT: TxPreparationRound,
+            Event.TRANSACT: EvaluationRound,
+        },
+        EvaluationRound: {
+            Event.NO_MAJORITY: EvaluationRound,
+            Event.ROUND_TIMEOUT: EvaluationRound,
+            Event.DONE: TxPreparationRound,
+            Event.ERROR: FinishedDecisionMakingRound,
         },
         TxPreparationRound: {
             Event.NO_MAJORITY: TxPreparationRound,
