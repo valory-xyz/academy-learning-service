@@ -19,7 +19,7 @@ connections: []
 contracts:
 - valory/gnosis_safe:0.1.0:bafybeib375xmvcplw7ageic2np3hq4yqeijrvd5kl7rrdnyvswats6ngmm
 - valory/erc20:0.1.0:bafybeie7n4azsbr6i3wlovh5f3qmke6eh4l6zpualde2k2eej4imfyjtjm
-- valory/erc20_new:0.1.0:bafybeib2y4z4os2abxsdnqosiym46mtziirkhk7mbh6r7ce22kifji2dou
+- valory/erc20_new:0.1.0:bafybeiey3hwc2rf4z3jx6r4jrjib75mqe4evnrzz7kfqg2lt5e22p24gwm
 - valory/multisend:0.1.0:bafybeig5byt5urg2d2bsecufxe5ql7f4mezg3mekfleeh32nmuusx66p4y
 protocols:
 - valory/contract_api:1.0.0:bafybeidgu7o5llh26xp3u3ebq3yluull5lupiyeu6iooi2xyymdrgnzq5i

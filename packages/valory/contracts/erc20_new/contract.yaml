@@ -1,0 +1,31 @@
+name: erc20_new
+author: valory
+version: 0.1.0
+type: contract
+description: ERC20 token contract
+license: Apache-2.0
+aea_version: '>=1.0.0, <2.0.0'
+fingerprint:
+  README.md: bafybeif7hmm6izsjzpricvczn6dgyky22g3fryjmni7qdf6gybaalgmv5a
+  __init__.py: bafybeiakinrsb2vekfckyvjewz2c3quhf5gq2556royhuxiu4uhhscgo6m
+  build/ERC20_NEW.json: bafybeidc2ciuhnallxjzy4pmq3xhlcm5sotszmwk4ekrhebzncowozxrpa
+  contract.py: bafybeifwfp437ili2fgjchm4vama4ewgsfcgj3gxp6tqgkp233rwqaxx3q
+fingerprint_ignore_patterns: []
+contracts: []
+class_name: ERC20_NEW
+contract_interface_paths:
+  ethereum: build/ERC20_NEW.json
+dependencies:
+  ecdsa:
+    version: '>=0.15'
+  eth_typing: {}
+  hexbytes: {}
+  open-aea-ledger-ethereum:
+    version: ==1.57.0
+  open-aea-test-autonomy:
+    version: ==0.16.1
+  packaging: {}
+  requests:
+    version: ==2.28.1
+  web3:
+    version: <7,>=6.0.0
