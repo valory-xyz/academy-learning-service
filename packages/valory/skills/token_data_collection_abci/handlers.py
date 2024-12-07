@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 #
-#   Copyright 2024 Valory AG
+#   Copyright 2021-2023 Valory AG
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,29 +16,32 @@
 #   limitations under the License.
 #
 # ------------------------------------------------------------------------------
+# mypy: disable-error-code="import"
+# pylint: disable=import-error
 
-"""This module contains the handlers for the skill of LearningChainedAbciApp."""
+"""This module contains the handler for the 'registration_abci' skill."""
 
 from packages.valory.skills.abstract_round_abci.handlers import (
-    ABCIRoundHandler as BaseABCIRoundHandler,
+    ABCIRoundHandler as BaseABCIRoundHandler,  # type: ignore[import]
 )
 from packages.valory.skills.abstract_round_abci.handlers import (
-    ContractApiHandler as BaseContractApiHandler,
+    ContractApiHandler as BaseContractApiHandler,  # type: ignore[import]
 )
 from packages.valory.skills.abstract_round_abci.handlers import (
-    IpfsHandler as BaseIpfsHandler,
+    HttpHandler as BaseHttpHandler,  # type: ignore[import]
 )
 from packages.valory.skills.abstract_round_abci.handlers import (
-    LedgerApiHandler as BaseLedgerApiHandler,
+    IpfsHandler as BaseIpfsHandler,  # type: ignore[import]
 )
 from packages.valory.skills.abstract_round_abci.handlers import (
-    SigningHandler as BaseSigningHandler,
+    LedgerApiHandler as BaseLedgerApiHandler,  # type: ignore[import]
 )
 from packages.valory.skills.abstract_round_abci.handlers import (
-    TendermintHandler as BaseTendermintHandler,
+    SigningHandler as BaseSigningHandler,  # type: ignore[import]
 )
-from packages.valory.skills.learning_abci.handlers import HttpHandler as BaseHttpHandler
-
+from packages.valory.skills.abstract_round_abci.handlers import (
+    TendermintHandler as BaseTendermintHandler,  # type: ignore[import]
+)
 
 
 ABCIHandler = BaseABCIRoundHandler

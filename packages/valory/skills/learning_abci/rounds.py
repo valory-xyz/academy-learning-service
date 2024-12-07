@@ -139,16 +139,7 @@ class DecisionMakingRound(CollectSameUntilThresholdRound):
     def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Event]]:
         """Process the end of the block."""
 
-        if self.threshold_reached:
-            event = Event(self.most_voted_payload)
-            return self.synchronized_data, event
-
-        if not self.is_majority_possible(
-            self.collection, self.synchronized_data.nb_participants
-        ):
-            return self.synchronized_data, Event.NO_MAJORITY
-
-        return None
+        return self.synchronized_data, Event.DONE
 
     # Event.DONE, Event.ERROR, Event.TRANSACT, Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
