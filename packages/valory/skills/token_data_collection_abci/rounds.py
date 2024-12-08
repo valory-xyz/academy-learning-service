@@ -77,11 +77,27 @@ class SynchronizedData(BaseSynchronizedData):
         return self._get_deserialized("participant_to_data_round")
     
     @property
+    def ohlc_market_data_ipfs_hash(self) -> Optional[str]:
+        """Get the top_crypto_currencies."""
+        return self.db.get("ohlc_market_data_ipfs_hash", None)
+    
+    @property
     def participant_to_historical_round(self) -> DeserializedCollection:
         """Agent to payload mapping for the DataPullRound."""
         return self._get_deserialized("participant_to_historical_round")
 
-class TopCryptoListDataCollectionRound(CollectDifferentUntilThresholdRound):
+    @property
+    def recent_data_ipfs_hash(self) -> Optional[str]:
+        """Get the top_crypto_currencies."""
+        return self.db.get("recent_data_ipfs_hash", None)
+
+    @property
+    def participant_to_recent_data_round(self) -> DeserializedCollection:
+        """Agent to payload mapping for the DataPullRound."""
+        return self._get_deserialized("participant_to_recent_data_round")
+
+
+class TopCryptoListDataCollectionRound(CollectSameUntilThresholdRound):
     """TopCryptoListDataCollectionRound round implementation."""
 
     payload_class = TopCryptoListDataCollectionPayload
@@ -99,34 +115,50 @@ class TopCryptoListDataCollectionRound(CollectDifferentUntilThresholdRound):
         get_name(SynchronizedData.top_crypto_currencies_ipfs_hash),
     )
 
+
 class HistoricalDataCollectionRound(CollectDifferentUntilThresholdRound):
     """HistoricalDataCollectionRound round implementation."""
 
     payload_class = HistoricalDataCollectionPayload
     synchronized_data_class = SynchronizedData
     done_event = Event.DONE
+
     collection_key = get_name(SynchronizedData.participant_to_historical_round)
-    selection_key = "content"
 
+    selection_key = (
+        get_name(SynchronizedData.ohlc_market_data_ipfs_hash),
+    )
 
-class RealTimeDataStreamingRound(CollectDifferentUntilThresholdRound):
-    """RealTimeDataStreamingRound round implementation."""
-
-    synchronized_data_class = SynchronizedData
-    done_event = Event.DONE
-    payload_class = RealTimeDataStreamingPayload
-    selection_key = "content"
-    collection_key = "content"
 
 
 class RecentDataCollectionRound(CollectDifferentUntilThresholdRound):
     """RecentDataCollectionRound round implementation."""
 
+    payload_class = RecentDataCollectionPayload
     synchronized_data_class = SynchronizedData
     done_event = Event.DONE
-    payload_class = RecentDataCollectionPayload
+  
+    # Collection key specifies where in the synchronized data the agento to payload mapping will be stored
+    collection_key = get_name(SynchronizedData.participant_to_recent_data_round)
+    
+    # Selection key specifies how to extract all the different objects from each agent's payload
+    # and where to store it in the synchronized data. Notice that the order follows the same order
+    # from the payload class.
+    selection_key = (
+        get_name(SynchronizedData.recent_data_ipfs_hash),
+    )
+
+
+
+class RealTimeDataStreamingRound(CollectDifferentUntilThresholdRound):
+    """RealTimeDataStreamingRound round implementation."""
+
+    payload_class = RealTimeDataStreamingPayload
+    synchronized_data_class = SynchronizedData
+    done_event = Event.DONE
     selection_key = "content"
     collection_key = "content"
+
 
 class FinishedRealTimeDataStreamingRound(DegenerateRound):
     """FinishedRealTimeDataStreamingRound"""

@@ -33,8 +33,8 @@ skills:
 - valory/abstract_abci:0.1.0:bafybeidz54kvxhbdmpruzguuzzq7bjg4pekjb5amqobkxoy4oqknnobopu
 - valory/abstract_round_abci:0.1.0:bafybeiajjzuh6vf23crp55humonknirvv2f4s3dmdlfzch6tc5ow52pcgm
 - valory/learning_abci:0.1.0:bafybeig3sigsij4uuhuwyd3fvfzsfc7tkldcnrnhxfxup7ggydfdp5rkaa
-- valory/token_data_collection_abci:0.1.0:bafybeicdrjnmj3d7rz2q2lrb2ipikz4kd4nf2yzxnj4u7i2akjulwkvebu
-- valory/learning_chained_abci:0.1.0:bafybeift5yx6552cjpqstd6pgexmttr5qk3a3xeonzhqkfypsmv5pexa34
+- valory/token_data_collection_abci:0.1.0:bafybeihtlc5knc3auelk35nrzogyl7ddzaj6m5veygmbprvkgyxupqsnfa
+- valory/learning_chained_abci:0.1.0:bafybeihjq332wn7hcw4seiipnbcmnmoletwyaffs6e7enw4zrjx3iiijdu
 - valory/registration_abci:0.1.0:bafybeiffipsowrqrkhjoexem7ern5ob4fabgif7wa6gtlszcoaop2e3oey
 - valory/reset_pause_abci:0.1.0:bafybeif4lgvbzsmzljesxbphycdv52ka7qnihyjrjpfaseclxadcmm6yiq
 - valory/termination_abci:0.1.0:bafybeiekkpo5qef5zaeagm3si6v45qxcojvtjqe4a5ceccvk4q7k3xi3bi

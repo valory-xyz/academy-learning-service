@@ -19,8 +19,7 @@ from packages.valory.skills.abstract_round_abci.base import BaseTxPayload
 @dataclass(frozen=True)
 class TopCryptoListDataCollectionPayload(BaseTxPayload):
     """TopCryptoListDataCollectionPayload class."""
-
-    content: str
+    
     top_crypto_currencies: Optional[str]
     top_crypto_currencies_ipfs_hash: Optional[str]
 
@@ -28,13 +27,13 @@ class TopCryptoListDataCollectionPayload(BaseTxPayload):
 class HistoricalDataCollectionPayload(BaseTxPayload):
     """HistoricalDataCollectionPayload class."""
 
-    content: str
+    ohlc_market_data_ipfs_hash: Optional[str]
 
 @dataclass(frozen=True)
 class RecentDataCollectionPayload(BaseTxPayload):
     """RecentDataCollectionPayload class."""
 
-    content: str
+    recent_data_ipfs_hash: Optional[str]
 
 @dataclass(frozen=True)
 class RealTimeDataStreamingPayload(BaseTxPayload):

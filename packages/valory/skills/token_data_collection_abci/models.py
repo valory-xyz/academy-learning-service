@@ -19,6 +19,7 @@
 
 """This module contains the shared state for the abci skill of TokenDataCollectionAbciApp."""
 
+import datetime
 from typing import Any
 from packages.valory.skills.token_data_collection_abci.rounds import (
     TokenDataCollectionAbciApp,  # type: ignore[import]
@@ -40,9 +41,10 @@ from packages.valory.skills.abstract_round_abci.models import (
 
 Requests = BaseRequests
 BenchmarkTool = BaseBenchmarkTool
-
+    
 
 class SharedState(BaseSharedState):
+
     """Keep the current shared state of the skill."""
 
     abci_app_cls = TokenDataCollectionAbciApp

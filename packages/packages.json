@@ -2,10 +2,10 @@
     "dev": {
         "contract/valory/erc20/0.1.0": "bafybeibyhuxozkkvsymqz45vxixr3w3bs4vsvxg2nsx5jlyi3f3hhn7ezi",
         "skill/valory/learning_abci/0.1.0": "bafybeig3sigsij4uuhuwyd3fvfzsfc7tkldcnrnhxfxup7ggydfdp5rkaa",
-        "skill/valory/token_data_collection_abci/0.1.0": "bafybeicdrjnmj3d7rz2q2lrb2ipikz4kd4nf2yzxnj4u7i2akjulwkvebu",
-        "skill/valory/learning_chained_abci/0.1.0": "bafybeift5yx6552cjpqstd6pgexmttr5qk3a3xeonzhqkfypsmv5pexa34",
-        "agent/valory/learning_agent/0.1.0": "bafybeib4trpvujs2a3ogfjgm276bxbajlx7vbwdzkmowe5dtjj6v7xp6gy",
-        "service/valory/learning_service/0.1.0": "bafybeihfxdcwcfzapqrr5d25fyyxggzh6tyyx7qsxg5jo4wn3hdkdzks3e"
+        "skill/valory/token_data_collection_abci/0.1.0": "bafybeihtlc5knc3auelk35nrzogyl7ddzaj6m5veygmbprvkgyxupqsnfa",
+        "skill/valory/learning_chained_abci/0.1.0": "bafybeihjq332wn7hcw4seiipnbcmnmoletwyaffs6e7enw4zrjx3iiijdu",
+        "agent/valory/learning_agent/0.1.0": "bafybeibrjtbfpfo6rlpvpqs7g2qpfzqkq3vwx6orpgilf3ha6xjowe2ohe",
+        "service/valory/learning_service/0.1.0": "bafybeigfh7uxpw4gfehbgagnb7qx6vgvkun4ycsoq5w6ynbhxggqkatunq"
     },
     "third_party": {
         "protocol/open_aea/signing/1.0.0": "bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi",
