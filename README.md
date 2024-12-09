@@ -23,6 +23,11 @@ Through the implementation of this project, we have developed a system that can:
 - Provide actionable insights and predictive analytics to guide investment strategies.
 - Enhance investment decision-making with advanced data-driven models.
 
+# Check It Out End Output
+
+link - https://gateway.autonolas.tech/ipfs/QmakmAVwbMRBpqVjMKBsi4pKb6gcUUvVtGwPNzezvSkXjY/metadata.json
+
+
 ## How The End Result Will Look
 
 The end result is a user-friendly interface displaying various analytical outputs and predictions, accessible via a web dashboard. Users can view categorized lists of cryptocurrencies (like long-run stable tokens, short-run volatile tokens, etc.), accompanied by buy or avoid recommendations based on predictive analytics. Additionally, the system updates these lists and recommendations in real-time as new data is processed.
