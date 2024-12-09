@@ -32,7 +32,14 @@ PUBLIC_ID = PublicId.from_str("valory/ipfs_storage:0.1.0")
 
 
 class IPFSDataStorage(Contract):
-    """The IPFS Data Storage contract."""
+    """
+    This contract class interfaces with the Ethereum blockchain to interact with a smart contract designed
+    for the storage and retrieval of IPFS hashes related to various cryptocurrency data. It facilitates the
+    interaction with blockchain-stored IPFS hashes for comprehensive cryptocurrency analytics and insights.
+
+    Attributes:
+        contract_id (PublicId): Identifier for the contract, specifying its unique location within the AEA framework.
+    """
 
     contract_id = PUBLIC_ID
 
@@ -44,82 +51,120 @@ class IPFSDataStorage(Contract):
     ) -> JSONLike:
         """Check the balance of the given account."""
         contract_instance = cls.get_instance(ledger_api, contract_address)
-        ipfs_hash = getattr(contract_instance.functions, "getHistoricalDataIPFS")  # noqa
+        ipfs_hash = getattr(
+            contract_instance.functions, "getHistoricalDataIPFS"
+        )  # noqa
         ipfs_hash = ipfs_hash().call()
         return dict(ipfs_hash=ipfs_hash)
-    
+
     @classmethod
     def get_regulatory_geographic_data_ipfs(
         cls,
         ledger_api: EthereumApi,
         contract_address: str,
     ) -> JSONLike:
-        """Check the balance of the given account."""
+        """
+        Retrieve the IPFS hash for regulatory and geographic data from the blockchain.
+
+        Returns:
+            JSONLike: A dictionary containing the IPFS hash.
+        """
         contract_instance = cls.get_instance(ledger_api, contract_address)
-        ipfs_hash = getattr(contract_instance.functions, "getRegulatoryGeographicDataIPFS")  # noqa
+        ipfs_hash = getattr(
+            contract_instance.functions, "getRegulatoryGeographicDataIPFS"
+        )  # noqa
         ipfs_hash = ipfs_hash().call()
         return dict(ipfs_hash=ipfs_hash)
-    
+
     @classmethod
     def get_social_media_sentiment_data_ipfs(
         cls,
         ledger_api: EthereumApi,
         contract_address: str,
     ) -> JSONLike:
-        """Check the balance of the given account."""
+        """
+        Retrieve the IPFS hash for social media sentiment data from the blockchain.
+
+        Returns:
+            JSONLike: A dictionary containing the IPFS hash.
+        """
         contract_instance = cls.get_instance(ledger_api, contract_address)
-        ipfs_hash = getattr(contract_instance.functions, "getSocialMediaSentimentDataIPFS")  # noqa
+        ipfs_hash = getattr(
+            contract_instance.functions, "getSocialMediaSentimentDataIPFS"
+        )  # noqa
         ipfs_hash = ipfs_hash().call()
         return dict(ipfs_hash=ipfs_hash)
-    
+
     @classmethod
     def get_top_crypto_data_ipfs(
         cls,
         ledger_api: EthereumApi,
         contract_address: str,
     ) -> JSONLike:
-        """Check the balance of the given account."""
+        """
+        Retrieve the IPFS hash for the top cryptocurrency data from the blockchain.
+
+        Returns:
+            JSONLike: A dictionary containing the IPFS hash.
+        """
         contract_instance = cls.get_instance(ledger_api, contract_address)
         ipfs_hash = getattr(contract_instance.functions, "getTopCryptoDataIPFS")  # noqa
         ipfs_hash = ipfs_hash().call()
         return dict(ipfs_hash=ipfs_hash)
-    
+
     @classmethod
     def get_real_data_ipfs(
         cls,
         ledger_api: EthereumApi,
         contract_address: str,
     ) -> JSONLike:
-        """Check the balance of the given account."""
+        """
+        Retrieve the IPFS hash for real-time cryptocurrency data from the blockchain.
+
+        Returns:
+            JSONLike: A dictionary containing the IPFS hash.
+        """
         contract_instance = cls.get_instance(ledger_api, contract_address)
         ipfs_hash = getattr(contract_instance.functions, "getRealDataIPFS")  # noqa
         ipfs_hash = ipfs_hash().call()
         return dict(ipfs_hash=ipfs_hash)
-    
+
     @classmethod
     def get_recent_data_ipfs(
         cls,
         ledger_api: EthereumApi,
         contract_address: str,
     ) -> JSONLike:
-        """Check the balance of the given account."""
+        """
+        Retrieve the IPFS hash for recent cryptocurrency data from the blockchain.
+
+        Returns:
+            JSONLike: A dictionary containing the IPFS hash.
+        """
         contract_instance = cls.get_instance(ledger_api, contract_address)
         ipfs_hash = getattr(contract_instance.functions, "getRecentDataIPFS")  # noqa
         ipfs_hash = ipfs_hash().call()
         return dict(ipfs_hash=ipfs_hash)
-    
+
     @classmethod
     def get_comprehensive_crypto_insights_list_ipfs(
         cls,
         ledger_api: EthereumApi,
         contract_address: str,
     ) -> JSONLike:
-        """Check the balance of the given account."""
+        """
+        Retrieve the IPFS hash for a comprehensive list of cryptocurrency insights from the blockchain.
+
+        Returns:
+            JSONLike: A dictionary containing the IPFS hash.
+        """
         contract_instance = cls.get_instance(ledger_api, contract_address)
-        ipfs_hash = getattr(contract_instance.functions, "getComprehensiveCryptoInsightsListIPFS")  # noqa
+        ipfs_hash = getattr(
+            contract_instance.functions, "getComprehensiveCryptoInsightsListIPFS"
+        )  # noqa
         ipfs_hash = ipfs_hash().call()
         return dict(ipfs_hash=ipfs_hash)
-    
+
     @classmethod
     def build_comprehensive_crypto_insights_list_tx(
         cls,
@@ -127,8 +172,19 @@ class IPFSDataStorage(Contract):
         contract_address: str,
         _ipfsHash: str,
     ) -> Dict[str, bytes]:
-        """Build an Comprehensive Crypto Insights."""
+        """
+        Build a transaction to update the comprehensive cryptocurrency insights list on the blockchain.
+
+        Args:
+            ledger_api (LedgerApi): The API object to interact with the blockchain.
+            contract_address (str): The address of the deployed contract.
+            _ipfsHash (str): The new IPFS hash to be updated in the contract.
+
+        Returns:
+            Dict[str, bytes]: A dictionary containing the transaction data as bytes.
+        """
         contract_instance = cls.get_instance(ledger_api, contract_address)
-        data = contract_instance.encodeABI("updateComprehensiveCryptoInsightsListIpfs", args=(_ipfsHash,))
+        data = contract_instance.encodeABI(
+            "updateComprehensiveCryptoInsightsListIpfs", args=(_ipfsHash,)
+        )
         return {"data": bytes.fromhex(data[2:])}
-    
