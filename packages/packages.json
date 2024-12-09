@@ -1,11 +1,12 @@
 {
     "dev": {
         "contract/valory/erc20/0.1.0": "bafybeibyhuxozkkvsymqz45vxixr3w3bs4vsvxg2nsx5jlyi3f3hhn7ezi",
-        "skill/valory/learning_abci/0.1.0": "bafybeig3sigsij4uuhuwyd3fvfzsfc7tkldcnrnhxfxup7ggydfdp5rkaa",
-        "skill/valory/token_data_collection_abci/0.1.0": "bafybeihtlc5knc3auelk35nrzogyl7ddzaj6m5veygmbprvkgyxupqsnfa",
-        "skill/valory/learning_chained_abci/0.1.0": "bafybeihjq332wn7hcw4seiipnbcmnmoletwyaffs6e7enw4zrjx3iiijdu",
-        "agent/valory/learning_agent/0.1.0": "bafybeibrjtbfpfo6rlpvpqs7g2qpfzqkq3vwx6orpgilf3ha6xjowe2ohe",
-        "service/valory/learning_service/0.1.0": "bafybeigfh7uxpw4gfehbgagnb7qx6vgvkun4ycsoq5w6ynbhxggqkatunq"
+        "contract/valory/ipfs_storage/0.1.0": "bafybeiayh2msaf5js7ycp43nmueodpetsuwukjg4cddc6khbtoyzpnaeja",
+        "skill/valory/learning_abci/0.1.0": "bafybeieclloilybaoggk3fhdt5ovcsyf6xy6ntrwwo6oolhxjv5e7hyqya",
+        "skill/valory/token_data_collection_abci/0.1.0": "bafybeif4u22idlsfygyip3eeul3qwcharzyypvjorxl3htbfxekjvohq5q",
+        "skill/valory/learning_chained_abci/0.1.0": "bafybeiauweyybelnfywwlgttbo6iyfef6ozbw2hybfsm57cyjrwzfkbf2q",
+        "agent/valory/crypto_insight_agent/0.1.0": "bafybeihhtuioswmwrnwi662obi5dbp5yamlfld73y6dyegvshccd3qgyvy",
+        "service/valory/crypto_insight_service/0.1.0": "bafybeigefrffwecmr2xe5j7tmqsbybpqvt5cnuztdq2wc7w4z4kpgjyfq4"
     },
     "third_party": {
         "protocol/open_aea/signing/1.0.0": "bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi",

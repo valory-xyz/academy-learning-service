@@ -1,4 +1,4 @@
--e git+https://github.com/princevijay27/Trader-Agent.git@f0600799f73d33f1d47ffc00ba37e8b330904c33#egg=academy_learning_agent
+-e git+https://github.com/princevijay27/Trader-Agent.git@f0600799f73d33f1d47ffc00ba37e8b330904c33#egg=academy_crypto_insight_agent
 aiohappyeyeballs==2.4.3
 aiohttp==3.10.10
 aiosignal==1.3.1

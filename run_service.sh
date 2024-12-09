@@ -3,9 +3,9 @@
 REPO_PATH=$PWD
 
 # Remove previous service build
-if test -d learning_service; then
+if test -d crypto_insight_service; then
   echo "Removing previous service build (requires sudo permission)"
-  sudo rm -r learning_service
+  sudo rm -r crypto_insight_service
 fi
 
 # Remove empty directories to avoid wrong hashes
@@ -24,7 +24,7 @@ autonomy packages lock
 autonomy push-all
 
 # Fetch the service
-autonomy fetch --local --service valory/learning_service && cd learning_service
+autonomy fetch --local --service valory/crypto_insight_service && cd crypto_insight_service
 
 # Build the image
 autonomy init --reset --author author --remote --ipfs --ipfs-node "/dns/registry.autonolas.tech/tcp/443/https"

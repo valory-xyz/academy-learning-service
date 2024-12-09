@@ -27,7 +27,9 @@ states:
 - DataPullRound
 - CheckLateTxHashesRound
 - CheckTransactionHistoryRound
+- ComprehensiveCryptoInsightsRound
 - CollectSignatureRound
+- CryptoTxPreparationRound
 - DecisionMakingRound
 - FinalizationRound
 - HistoricalDataCollectionRound
@@ -61,9 +63,17 @@ transition_func:
     (CheckTransactionHistoryRound, NEGATIVE): SelectKeeperTransactionSubmissionBRound
     (CheckTransactionHistoryRound, NONE): RandomnessTransactionSubmissionRound
     (CheckTransactionHistoryRound, NO_MAJORITY): CheckTransactionHistoryRound
+    (ComprehensiveCryptoInsightsRound, DONE): CryptoTxPreparationRound
+    (ComprehensiveCryptoInsightsRound, NO_MAJORITY): ComprehensiveCryptoInsightsRound
+    (ComprehensiveCryptoInsightsRound, ROUND_TIMEOUT): ComprehensiveCryptoInsightsRound
+    (ComprehensiveCryptoInsightsRound, ERROR): ComprehensiveCryptoInsightsRound
     (CollectSignatureRound, DONE): FinalizationRound
     (CollectSignatureRound, NO_MAJORITY): ResetRound
     (CollectSignatureRound, ROUND_TIMEOUT): CollectSignatureRound
+    (CryptoTxPreparationRound, DONE): RandomnessTransactionSubmissionRound
+    (CryptoTxPreparationRound, NO_MAJORITY): CryptoTxPreparationRound
+    (CryptoTxPreparationRound, ROUND_TIMEOUT): CryptoTxPreparationRound
+    (CryptoTxPreparationRound, ERROR): CryptoTxPreparationRound
     (DecisionMakingRound, DONE): TopCryptoListDataCollectionRound
     (DecisionMakingRound, ERROR): ResetAndPauseRound
     (DecisionMakingRound, NO_MAJORITY): DecisionMakingRound
@@ -82,7 +92,7 @@ transition_func:
     (RandomnessTransactionSubmissionRound, DONE): SelectKeeperTransactionSubmissionARound
     (RandomnessTransactionSubmissionRound, NO_MAJORITY): RandomnessTransactionSubmissionRound
     (RandomnessTransactionSubmissionRound, ROUND_TIMEOUT): RandomnessTransactionSubmissionRound
-    (RealTimeDataStreamingRound, DONE): ResetAndPauseRound
+    (RealTimeDataStreamingRound, DONE): ComprehensiveCryptoInsightsRound
     (RealTimeDataStreamingRound, NO_MAJORITY): RealTimeDataStreamingRound
     (RealTimeDataStreamingRound, ROUND_TIMEOUT): RealTimeDataStreamingRound
     (RealTimeDataStreamingRound, ERROR): RealTimeDataStreamingRound

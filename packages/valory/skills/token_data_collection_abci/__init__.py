@@ -18,7 +18,21 @@
 # ------------------------------------------------------------------------------
 # pylint: disable=import-error
 
-"""This module contains the implementation of the token_data_collection_abci skill."""
+"""
+Cryptocurrency Analysis Package
+
+This package provides modules and functions for analyzing cryptocurrency markets. 
+It includes capabilities for data collection, processing, analysis, and prediction 
+models that forecast market trends and investment opportunities.
+
+Modules:
+- data_collection: Functions to collect historical, recent, and real-time cryptocurrency data.
+- data_cleaning: Utilities to clean and preprocess the collected data.
+- sentiment_analysis: Tools to perform sentiment analysis on social media data.
+- predictive_models: Models to predict future market behaviors and trends.
+- list_generation: Functions to generate lists of cryptocurrencies based on various criteria.
+
+"""
 
 from aea.configurations.base import PublicId  # type: ignore[import]
 

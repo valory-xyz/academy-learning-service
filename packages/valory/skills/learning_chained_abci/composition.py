@@ -41,7 +41,7 @@ from packages.valory.skills.termination_abci.rounds import (
 abci_app_transition_mapping: AbciAppTransitionMapping = {
     RegistrationAbci.FinishedRegistrationRound: LearningAbci.DataPullRound,
     LearningAbci.FinishedDecisionMakingRound: TokenDataCollectionAbci.TopCryptoListDataCollectionRound,
-    TokenDataCollectionAbci.FinishedRealTimeDataStreamingRound: ResetAndPauseAbci.ResetAndPauseRound,
+    TokenDataCollectionAbci.FinishedRealTimeDataStreamingRound: TxSettlementAbci.RandomnessTransactionSubmissionRound,
     LearningAbci.FinishedTxPreparationRound: TxSettlementAbci.RandomnessTransactionSubmissionRound,
     TxSettlementAbci.FinishedTransactionSubmissionRound: ResetAndPauseAbci.ResetAndPauseRound,
     TxSettlementAbci.FailedRound: TxSettlementAbci.RandomnessTransactionSubmissionRound,

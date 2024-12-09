@@ -17,7 +17,7 @@
 #
 # ------------------------------------------------------------------------------
 
-"""Package for valory/learning_agent agent."""
+"""Package for valory/crypto_insight_agent agent."""
 from pathlib import Path
 
 

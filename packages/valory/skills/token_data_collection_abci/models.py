@@ -19,6 +19,7 @@
 
 """This module contains the shared state for the abci skill of TokenDataCollectionAbciApp."""
 
+
 import datetime
 from typing import Any
 from packages.valory.skills.token_data_collection_abci.rounds import (
@@ -41,26 +42,49 @@ from packages.valory.skills.abstract_round_abci.models import (
 
 Requests = BaseRequests
 BenchmarkTool = BaseBenchmarkTool
-    
+
 
 class SharedState(BaseSharedState):
+    """
+    Represents the current shared state of the ABcI skill within the TokenDataCollectionAbciApp.
+    It extends the BaseSharedState, allowing for shared state variables and functionalities across various
+    components of the application.
 
-    """Keep the current shared state of the skill."""
+    Attributes:
+        abci_app_cls (TokenDataCollectionAbciApp): The ABcI application class this shared state is associated with.
+    """
 
     abci_app_cls = TokenDataCollectionAbciApp
 
 
 class Params(BaseParams):
-    """A model to represent params for multiple abci apps."""
+    """
+    Parameters model for ABcI applications, managing configurations across multiple applications.
+    Provides a structured way to handle parameter passing and default values.
+
+    Attributes:
+        coingecko_histroy_data_template (str): Template string for fetching historical data from the Coingecko API.
+        transfer_target_address (Optional[str]): Target address for transferring assets, if applicable.
+        multisend_address (Optional[str]): Address used for multi-send transactions, retained for compatibility with other skills.
+        ipfs_storage_contract (str): The contract address for IPFS storage interactions.
+    """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        """Initialize the parameters object."""
+        """Initialize the parameters with defaults and required fields checking."""
 
         self.coingecko_histroy_data_template = self._ensure(
             "coingecko_histroy_data_template", kwargs, str
         )
-        
+
+        self.transfer_target_address = kwargs.get("transfer_target_address", None)
+
+        # multisend address is used in other skills, so we cannot pop it using _ensure
+        self.multisend_address = kwargs.get("multisend_address", None)
+
+        self.ipfs_storage_contract = self._ensure("ipfs_storage_contract", kwargs, str)
+
         super().__init__(*args, **kwargs)
 
+
 class CoingeckoTopCryptocurrenciesSpecs(ApiSpecs):
-    """A model that wraps ApiSpecs for Coingecko API."""
+    """Model that encapsulates API specifications for interfacing with the Coingecko API."""

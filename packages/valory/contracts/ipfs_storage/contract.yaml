@@ -1,0 +1,31 @@
+name: ipfs_storage
+author: valory
+version: 0.1.0
+type: contract
+description: ipfs_storage token contract
+license: Apache-2.0
+aea_version: '>=1.0.0, <2.0.0'
+fingerprint:
+  README.md: bafybeifmfma6rglvpa22odtozyosnp5mwljum64utxip2wgmezuhnjjjyi
+  __init__.py: bafybeiga57utq3hrmn54rvwp6sjwkfpxofpagwiba3xknwvzacuzd7o4j4
+  build/IPFSDataStorage.json: bafybeien7wrr3vzefcq3ihvkfsqf6njy7rvp6pfmmyfrv3djurcxgq4guq
+  contract.py: bafybeifdjymceig7nacdcr24hqqddcaumvecihgzmmrnn2aaitzwxhtsk4
+fingerprint_ignore_patterns: []
+contracts: []
+class_name: IPFSDataStorage
+contract_interface_paths:
+  ethereum: build/IPFSDataStorage.json
+dependencies:
+  ecdsa:
+    version: '>=0.15'
+  eth_typing: {}
+  hexbytes: {}
+  open-aea-ledger-ethereum:
+    version: ==1.57.0
+  open-aea-test-autonomy:
+    version: ==0.16.1
+  packaging: {}
+  requests:
+    version: ==2.28.1
+  web3:
+    version: <7,>=6.0.0

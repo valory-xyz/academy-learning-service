@@ -10,6 +10,8 @@ label: TokenDataCollectionAbciApp
 start_states: TopCryptoListDataCollectionRound
 states:
 - HistoricalDataCollectionRound
+- ComprehensiveCryptoInsightsRound
+- CryptoTxPreparationRound
 - FinishedRealTimeDataStreamingRound
 - RealTimeDataStreamingRound
 - RecentDataCollectionRound
@@ -19,7 +21,15 @@ transition_func:
     (HistoricalDataCollectionRound, NO_MAJORITY): HistoricalDataCollectionRound
     (HistoricalDataCollectionRound, ROUND_TIMEOUT): HistoricalDataCollectionRound
     (HistoricalDataCollectionRound, ERROR): HistoricalDataCollectionRound
-    (RealTimeDataStreamingRound, DONE): FinishedRealTimeDataStreamingRound
+    (ComprehensiveCryptoInsightsRound, DONE): CryptoTxPreparationRound
+    (ComprehensiveCryptoInsightsRound, NO_MAJORITY): ComprehensiveCryptoInsightsRound
+    (ComprehensiveCryptoInsightsRound, ROUND_TIMEOUT): ComprehensiveCryptoInsightsRound
+    (ComprehensiveCryptoInsightsRound, ERROR): ComprehensiveCryptoInsightsRound
+    (CryptoTxPreparationRound, DONE): FinishedRealTimeDataStreamingRound
+    (CryptoTxPreparationRound, NO_MAJORITY): CryptoTxPreparationRound
+    (CryptoTxPreparationRound, ROUND_TIMEOUT): CryptoTxPreparationRound
+    (CryptoTxPreparationRound, ERROR): CryptoTxPreparationRound
+    (RealTimeDataStreamingRound, DONE): ComprehensiveCryptoInsightsRound
     (RealTimeDataStreamingRound, NO_MAJORITY): RealTimeDataStreamingRound
     (RealTimeDataStreamingRound, ROUND_TIMEOUT): RealTimeDataStreamingRound
     (RealTimeDataStreamingRound, ERROR): RealTimeDataStreamingRound
