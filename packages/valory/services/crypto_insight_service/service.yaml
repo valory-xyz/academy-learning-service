@@ -5,9 +5,9 @@ description: A learning service.
 aea_version: '>=1.0.0, <2.0.0'
 license: Apache-2.0
 fingerprint:
-  README.md: bafybeid42pdrf6qrohedylj4ijrss236ai6geqgf3he44huowiuf7pl464
+  README.md: bafybeicpjoeab2f4rfagvifh257iaqayrokswthnea7mvbheuh3jxzo2re
 fingerprint_ignore_patterns: []
-agent: valory/crypto_insight_agent:0.1.0:bafybeihhtuioswmwrnwi662obi5dbp5yamlfld73y6dyegvshccd3qgyvy
+agent: valory/crypto_insight_agent:0.1.0:bafybeiclqaec2lsf5qxsocp77qwjoa5groyxfvr7feveuiddo2qrlf6koq
 number_of_agents: 4
 deployment:
   agent:

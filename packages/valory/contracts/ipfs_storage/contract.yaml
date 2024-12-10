@@ -6,10 +6,10 @@ description: ipfs_storage token contract
 license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
-  README.md: bafybeifmfma6rglvpa22odtozyosnp5mwljum64utxip2wgmezuhnjjjyi
-  __init__.py: bafybeiga57utq3hrmn54rvwp6sjwkfpxofpagwiba3xknwvzacuzd7o4j4
-  build/IPFSDataStorage.json: bafybeien7wrr3vzefcq3ihvkfsqf6njy7rvp6pfmmyfrv3djurcxgq4guq
-  contract.py: bafybeifdjymceig7nacdcr24hqqddcaumvecihgzmmrnn2aaitzwxhtsk4
+  README.md: bafybeif7hmm6izsjzpricvczn6dgyky22g3fryjmni7qdf6gybaalgmv5a
+  __init__.py: bafybeih7rzozhcny5v6aqaw6sjks2xzisuinhbeb2dm6mlwlwseaawv2h4
+  build/IPFSDataStorage.json: bafybeifmv6pmebsj2bshrtasyu3h3hxpxnpomhuajwkbs72qrbtsohe23a
+  contract.py: bafybeif3acsk32h7k2udwrnwkc75oxfdozpcug6yns5wyrv5nyjq5s3q5m
 fingerprint_ignore_patterns: []
 contracts: []
 class_name: IPFSDataStorage

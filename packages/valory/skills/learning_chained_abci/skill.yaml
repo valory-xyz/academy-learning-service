@@ -6,13 +6,13 @@ description: The chained abci for the learning skill.
 license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
-  __init__.py: bafybeihu5y5llhaefw32jodf2nc2x5tig7cfo2fallbodv6vodczunpbve
-  behaviours.py: bafybeicozfzdsvf6vraugvlgggejual7l7nokbjh4tyun2bwmzhag4bdye
-  composition.py: bafybeig7vuy2ctp67mzaaiojslv3zxrodd76v3wvtozig2nwlvjnr44qti
-  dialogues.py: bafybeiakqfqcpg7yrxt4bsyernhy5p77tci4qhmgqqjqi3ttx7zk6sklca
-  fsm_specification.yaml: bafybeie2e7hcrkjzuewi6ou5pfbry53hlrbp7ijwjrwn4ledlhfzvxsmo4
-  handlers.py: bafybeigcsdo4gyypgmyhikn7ktqypcb26nslr5hc3vkktyslcdrnoaepx4
-  models.py: bafybeieayt4s2sutbqto7nvh3wwqbyr4ew5jtprotiesnsuxq42xm3p6ta
+  __init__.py: bafybeiakr54srf2sqcemlwhjcygzhmw7ocl7kxigd5v67vdh32wdsp7mv4
+  behaviours.py: bafybeifbv46pbep7ar7s5fmujovlzffl3ic7dcbh5dnftgm5hfifxbzda4
+  composition.py: bafybeiazuve5ntvb767ci2fxundl4mgwuzzhazp64fmo7bommyoja5s6ym
+  dialogues.py: bafybeieitih3dljokpewlio4aci42rfackqlftjcxpuqbwxd5dzu6kzace
+  fsm_specification.yaml: bafybeifl55gnzvfbsxtzgy6ih7ahkktivzsbqbtfdzbnvpb2skjok23zhu
+  handlers.py: bafybeictsoipzhh3bjv5kgic3k7vjvwgzcgi6szhe2bquwawjyyilpmhde
+  models.py: bafybeiggjyxut3prfj3akxgh3die7ngfuau3qgdumgpcwbmec5lnqqukmi
 fingerprint_ignore_patterns: []
 connections: []
 contracts: []
@@ -22,8 +22,8 @@ skills:
 - valory/registration_abci:0.1.0:bafybeiffipsowrqrkhjoexem7ern5ob4fabgif7wa6gtlszcoaop2e3oey
 - valory/reset_pause_abci:0.1.0:bafybeif4lgvbzsmzljesxbphycdv52ka7qnihyjrjpfaseclxadcmm6yiq
 - valory/termination_abci:0.1.0:bafybeiekkpo5qef5zaeagm3si6v45qxcojvtjqe4a5ceccvk4q7k3xi3bi
-- valory/learning_abci:0.1.0:bafybeieclloilybaoggk3fhdt5ovcsyf6xy6ntrwwo6oolhxjv5e7hyqya
-- valory/token_data_collection_abci:0.1.0:bafybeif4u22idlsfygyip3eeul3qwcharzyypvjorxl3htbfxekjvohq5q
+- valory/learning_abci:0.1.0:bafybeid3xvgro6qbjymhpxmg46jraf75zfx462kp6reotkvlxn72x33xji
+- valory/token_data_collection_abci:0.1.0:bafybeickiiwapmwq26n26j7ds32snneefvno4hlgcoifhw6sn3fwy2v3rm
 - valory/transaction_settlement_abci:0.1.0:bafybeielv6eivt2z6nforq43xewl2vmpfwpdu2s2vfogobziljnwsclmlm
 behaviours:
   main:

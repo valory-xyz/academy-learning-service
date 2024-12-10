@@ -6,19 +6,19 @@ description: A learning skill.
 license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
-  __init__.py: bafybeiho3lkochqpmes4f235chq26oggmwnol3vjuvhosleoubbjirbwaq
-  behaviours.py: bafybeievttfkrfm7sc4352unnicrbwjhamdd3pxa3mlugs5xwtmb5vnewe
-  dialogues.py: bafybeifqjbumctlffx2xvpga2kcenezhe47qhksvgmaylyp5ypwqgfar5u
-  fsm_specification.yaml: bafybeigbbydxuqephdpatb3fp3sxnvr77bfvvo5hwjimxfpgyl32wupe64
-  handlers.py: bafybeigjadr4thz6hfpfx5abezbwnqhbxmachf4efasrn4z2vqhsqgnyvi
-  models.py: bafybeihxankk5qbb6ikp75c6f47ndoqs2l46an6k2mvbhbr7dxoqrsdnkq
-  payloads.py: bafybeidc6qqnfvd7qovjatt2i2kbga7pj6epdghlzqxdhzx6b6j6p7ubvm
-  rounds.py: bafybeia4aq5ammyvjosw6bz6zdvspgim34lxcpzqcz56dh3p7d4vuunrvi
+  __init__.py: bafybeidvwmcv6qq57eizbh6zol4aoqpjgfnfktw4irtaecmgibc4ikryq4
+  behaviours.py: bafybeihdbq6dn2xj64jggvluumbaf3lsnfhvgaplwtzl7jsylzofc3wzny
+  dialogues.py: bafybeibbir7usmm3cxo42edjvnfx4tszqgow2nxusa55kp4a5axaomfvse
+  fsm_specification.yaml: bafybeid4cq7pnskfzbavufbpkkhw64yiniksyuioa7w3nr4f7tneh6ng2y
+  handlers.py: bafybeifaxd5x2wg6v2ni4cml34xjuxipuzvqakdmjxxfikuw2j3bpatotq
+  models.py: bafybeic6kpdfjypvuj6t2dgct7ociryqvegmxjqahqmuoevjwlt6rh6k24
+  payloads.py: bafybeibqkk5sixe47mn3dc3d3vwek4fokkxbwdroqpldh7j4b7itizqpmi
+  rounds.py: bafybeih7zyvcfncphuu7eu2rk3d3zca776oidgn7rpw63hlio25z2fhycy
 fingerprint_ignore_patterns: []
 connections: []
 contracts:
 - valory/gnosis_safe:0.1.0:bafybeib375xmvcplw7ageic2np3hq4yqeijrvd5kl7rrdnyvswats6ngmm
-- valory/erc20:0.1.0:bafybeibyhuxozkkvsymqz45vxixr3w3bs4vsvxg2nsx5jlyi3f3hhn7ezi
+- valory/erc20:0.1.0:bafybeihoudwg7wrjh47vkcf2z3frpq7rscikqhc2oissozl6q34uay4dfm
 - valory/multisend:0.1.0:bafybeig5byt5urg2d2bsecufxe5ql7f4mezg3mekfleeh32nmuusx66p4y
 protocols:
 - valory/contract_api:1.0.0:bafybeidgu7o5llh26xp3u3ebq3yluull5lupiyeu6iooi2xyymdrgnzq5i

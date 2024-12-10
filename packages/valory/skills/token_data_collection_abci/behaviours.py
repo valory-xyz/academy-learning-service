@@ -29,6 +29,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 import numpy as np
 import requests
+from tabulate import tabulate 
 
 from packages.valory.contracts.erc20.contract import ERC20
 from packages.valory.contracts.ipfs_storage.contract import IPFSDataStorage
@@ -1293,13 +1294,28 @@ class ComprehensiveCryptoInsightsBehaviour(TokenDataCollectionBaseBehaviour):
                     token_generator
                 )
                 self.context.logger.info(
-                    f"Analysis complete. Results saved to token_lists.json:{comprehensive_crypto_currencies_insights}"
+                    f"Analysis complete. comprehensive_crypto_currencies_insights:{comprehensive_crypto_currencies_insights}"
                 )
 
                 self.context.logger.info(
-                    f"Analysis complete. Results saved to crypto_token_lists.json:{type(comprehensive_crypto_currencies_insights)}"
+                    f"Analysis complete.:{type(comprehensive_crypto_currencies_insights)}"
                 )
 
+                # Print tables for different token lists
+                self.context.logger.info("\n=== Long Run Tokens ===")
+                self.print_token_table(comprehensive_crypto_currencies_insights['long_run_tokens'])
+                
+                self.context.logger.info("\n=== Short Run Tokens ===")
+                self.print_token_table(comprehensive_crypto_currencies_insights['short_run_tokens'])
+                
+                self.context.logger.info("\n=== Betting Tokens ===")
+                self.print_token_table(comprehensive_crypto_currencies_insights['betting_tokens'])
+                
+                self.context.logger.info("\n=== Buy/Avoid Recommendations ===")
+                self.print_token_table(comprehensive_crypto_currencies_insights['buy_avoid_recommendations'])
+                
+                print("Analysis complete.")
+        
                 # Store the recent data in IPFS
                 comprehensive_crypto_currencies_insights_ipfs_hash = (
                     yield from self.send_comprensive_crypto_list_data_to_ipfs(
@@ -1326,6 +1342,42 @@ class ComprehensiveCryptoInsightsBehaviour(TokenDataCollectionBaseBehaviour):
         except Exception as e:
             self.context.logger.error(f"Error in recent data collection: {e}")
             self.context.logger.exception(traceback.format_exc())
+
+    def print_token_table(self,tokens):
+        """
+        Print a formatted table of token data
+        
+        Args:
+            tokens (list): List of token dictionaries
+        """
+        if not tokens:
+            print("No tokens in this category.")
+            return
+        
+        # Prepare table data
+        table_data = []
+        headers = [
+            "Name", 
+            "Symbol", 
+            "Volatility", 
+            "Liquidity Score", 
+            "Sentiment Score", 
+            "Recommendation",
+        ]
+        
+        for token in tokens:
+            table_data.append([
+                token['name'],
+                token['symbol'],
+                f"{token['volatility']:.3f}",
+                f"{token['liquidity_score']:.3f}",
+                f"{token['sentiment_score']:.3f}",
+                token['recommendation'],
+            ])
+        
+        # Print table using tabulate
+        print(tabulate(table_data, headers=headers, tablefmt="grid"))
+
 
     def define_ipfs_urls(self) -> Dict[str, str]:
         """
@@ -1587,7 +1639,7 @@ class ComprehensiveCryptoInsightsBehaviour(TokenDataCollectionBaseBehaviour):
         Returns:
             dict: Organized token lists
         """
-        token_lists = {
+        comprehensive_crypto_currencies_insights = {
             "long_run_tokens": [],
             "short_run_tokens": [],
             "tokens_in_demand": [],
@@ -1603,19 +1655,19 @@ class ComprehensiveCryptoInsightsBehaviour(TokenDataCollectionBaseBehaviour):
                 and token["sentiment_score"] > 0.5
                 and token["liquidity_score"] > 5
             ):
-                token_lists["long_run_tokens"].append(token)
+                comprehensive_crypto_currencies_insights["long_run_tokens"].append(token)
 
             # Short run tokens
             if token["volatility"] > 0.5 and token["sentiment_score"] > 0.2:
-                token_lists["short_run_tokens"].append(token)
+                comprehensive_crypto_currencies_insights["short_run_tokens"].append(token)
 
             # Tokens in demand
             if token.get("total_volume", 0) > 1000000 and token.get("latest_news"):
-                token_lists["tokens_in_demand"].append(token)
+                comprehensive_crypto_currencies_insights["tokens_in_demand"].append(token)
 
             # Highlighted tokens
             if token.get("latest_news"):
-                token_lists["highlighted_tokens"].append(token)
+                comprehensive_crypto_currencies_insights["highlighted_tokens"].append(token)
 
             # Betting tokens
             if (
@@ -1623,12 +1675,12 @@ class ComprehensiveCryptoInsightsBehaviour(TokenDataCollectionBaseBehaviour):
                 and token["sentiment_score"] > 0.3
                 and token["liquidity_score"] > 3
             ):
-                token_lists["betting_tokens"].append(token)
+                comprehensive_crypto_currencies_insights["betting_tokens"].append(token)
 
             # Buy/Avoid recommendations
-            token_lists["buy_avoid_recommendations"].append(token)
+            comprehensive_crypto_currencies_insights["buy_avoid_recommendations"].append(token)
 
-        return token_lists
+        return comprehensive_crypto_currencies_insights
 
 
 class CryptoTxPreparationBehaviour(
