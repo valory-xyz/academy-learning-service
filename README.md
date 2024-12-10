@@ -130,5 +130,5 @@ The end result is a user-friendly interface displaying various analytical output
 4. Look at the service logs for one of the agents (on another terminal):
 
     ```
-    docker logs -f learningservice_abci_0
+    docker logs -f crypto_insight_service
     ```
