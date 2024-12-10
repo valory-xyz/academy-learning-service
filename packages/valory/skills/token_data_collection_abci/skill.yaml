@@ -1,25 +1,27 @@
-name: learning_abci
+name: token_data_collection_abci
 author: valory
 version: 0.1.0
 type: skill
-description: A learning skill.
+description: Token Data Collection Skill.
 license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
-  __init__.py: bafybeidvwmcv6qq57eizbh6zol4aoqpjgfnfktw4irtaecmgibc4ikryq4
-  behaviours.py: bafybeihdbq6dn2xj64jggvluumbaf3lsnfhvgaplwtzl7jsylzofc3wzny
-  dialogues.py: bafybeibbir7usmm3cxo42edjvnfx4tszqgow2nxusa55kp4a5axaomfvse
-  fsm_specification.yaml: bafybeid4cq7pnskfzbavufbpkkhw64yiniksyuioa7w3nr4f7tneh6ng2y
-  handlers.py: bafybeifaxd5x2wg6v2ni4cml34xjuxipuzvqakdmjxxfikuw2j3bpatotq
-  models.py: bafybeic6kpdfjypvuj6t2dgct7ociryqvegmxjqahqmuoevjwlt6rh6k24
-  payloads.py: bafybeibqkk5sixe47mn3dc3d3vwek4fokkxbwdroqpldh7j4b7itizqpmi
-  rounds.py: bafybeih7zyvcfncphuu7eu2rk3d3zca776oidgn7rpw63hlio25z2fhycy
+  README.md: bafybeieufxdygsipz52wu4nxbypf6kpru7pxhplnzw5ldxvibol2hlkgea
+  __init__.py: bafybeifzy3rrnaml447mma5ooqhobda6ptey2m4ggcvtgwk4ewukkyyuci
+  behaviours.py: bafybeid33gh7qvua3pv3hha6xipnykien4sbzyyfxu2lmoeems5fdwlyny
+  dialogues.py: bafybeibnqohfskh4wlf6raywldhdqxlphkly3kwrgawy4krhedt64ttqae
+  fsm_specification.yaml: bafybeidbs6zqpkikcjvbgamb4esrp7ffnzoy5teg6ajqgvtlixwfthjxpi
+  handlers.py: bafybeiaenjxuxrvf56v6lutjw2ikxwugotlkvmsnwn5cr5kyxlannezg7y
+  models.py: bafybeidqfwn5y53hbcylrsdp7fdw5k5g7to7b2fr6w3ncirtaxa43w7d7m
+  payloads.py: bafybeia7uxxukkfniz5gu66cqi2s3os5oybfm2hzqfzf3elngutr6uk7a4
+  rounds.py: bafybeietsngervdeby2gmdekrgissviyqxqulemwno7opac6z5nxmmbmhq
 fingerprint_ignore_patterns: []
 connections: []
 contracts:
 - valory/gnosis_safe:0.1.0:bafybeib375xmvcplw7ageic2np3hq4yqeijrvd5kl7rrdnyvswats6ngmm
 - valory/erc20:0.1.0:bafybeihoudwg7wrjh47vkcf2z3frpq7rscikqhc2oissozl6q34uay4dfm
 - valory/multisend:0.1.0:bafybeig5byt5urg2d2bsecufxe5ql7f4mezg3mekfleeh32nmuusx66p4y
+- valory/ipfs_storage:0.1.0:bafybeifoca6bjxnvtrswerkpb7jmnnox5wwdrys2dsorrzans4qhyaxroi
 protocols:
 - valory/contract_api:1.0.0:bafybeidgu7o5llh26xp3u3ebq3yluull5lupiyeu6iooi2xyymdrgnzq5i
 - valory/ledger_api:1.0.0:bafybeihdk6psr4guxmbcrc26jr2cbgzpd5aljkqvpwo64bvaz7tdti2oni
@@ -29,7 +31,7 @@ skills:
 behaviours:
   main:
     args: {}
-    class_name: LearningRoundBehaviour
+    class_name: TokenDataCollectionRoundBehaviour
 handlers:
   abci:
     args: {}
@@ -77,8 +79,9 @@ models:
       cleanup_history_depth: 1
       cleanup_history_depth_current: null
       drand_public_key: 868f005eb8e6e4ca0a47c8a77ceaa5309a47978a7c71bc5cce96366b5d7a569937c529eeda66c7293784a9402801af31
-      finalize_timeout: 60.0
+      finalize_timeout: 10.0
       genesis_config:
+        genesis_time: '2022-09-26T00:00:00.000000000Z'
         chain_id: chain-c4daS1
         consensus_params:
           block:
@@ -86,67 +89,71 @@ models:
             max_gas: '-1'
             time_iota_ms: '1000'
           evidence:
-            max_age_duration: '172800000000000'
             max_age_num_blocks: '100000'
+            max_age_duration: '172800000000000'
             max_bytes: '1048576'
           validator:
             pub_key_types:
             - ed25519
           version: {}
-        genesis_time: '2022-05-20T16:00:21.735122717Z'
         voting_power: '10'
       history_check_timeout: 1205
-      ipfs_domain_name: null
-      keeper_allowed_retries: 3
+      init_fallback_gas: 0
       keeper_timeout: 30.0
+      keeper_allowed_retries: 3
+      light_slash_unit_amount: 5000000000000000
       max_attempts: 10
       max_healthcheck: 120
       on_chain_service_id: null
-      request_retry_delay: 1.0
-      request_timeout: 10.0
-      reset_pause_duration: 10
+      reset_pause_duration: 300
       reset_tendermint_after: 2
       retry_attempts: 400
       retry_timeout: 3
+      request_retry_delay: 1.0
+      request_timeout: 10.0
       round_timeout_seconds: 30.0
       service_id: learning
       service_registry_address: null
       setup:
         all_participants:
         - '0x0000000000000000000000000000000000000000'
-        consensus_threshold: null
         safe_contract_address: '0x0000000000000000000000000000000000000000'
+        consensus_threshold: null
       share_tm_config_on_startup: false
+      slash_cooldown_hours: 3
+      slash_threshold_amount: 10000000000000000
+      serious_slash_unit_amount: 8000000000000000
       sleep_time: 1
       tendermint_check_sleep_delay: 3
       tendermint_com_url: http://localhost:8080
       tendermint_max_retries: 5
-      tendermint_p2p_url: localhost:26656
       tendermint_url: http://localhost:26657
+      tendermint_p2p_url: localhost:26656
       tx_timeout: 10.0
       validate_timeout: 1205
       service_endpoint_base: https://learning.autonolas.tech/
-      coingecko_price_template: https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}
-      coingecko_api_key: null
+      coingecko_histroy_data_template: https://api.coingecko.com/api/v3/coins/
+      ipfs_storage_contract: '0x5eA0bae9D62bB3dD7A5714e8CA54f4A02B3cb682'
       transfer_target_address: '0x0000000000000000000000000000000000000000'
-      olas_token_address: '0xcE11e14225575945b8E6Dc0D4F2dD4C570f79d9f'
       multisend_address: '0xA238CBeb142c10Ef7Ad8442C6D1f9E89e07e7761'
     class_name: Params
-  coingecko_specs:
+  coingecko_top_cryptocurrencies_specs:
     args:
       api_id: coingecko
       headers:
         Accept: application/json
       method: GET
       parameters:
-        ids: autonolas
-        vs_currencies: usd
-        x_cg_demo_api_key: null
-      response_key: autonolas
-      response_type: dict
+        vs_currency: usd
+        order: market_cap_desc
+        per_page: 10
+        page: 1
+        sparkline: false
+      response_key: null
+      response_type: list
       retries: 5
-      url: https://api.coingecko.com/api/v3/simple/price
-    class_name: CoingeckoSpecs
+      url: https://api.coingecko.com/api/v3/coins/markets
+    class_name: CoingeckoTopCryptocurrenciesSpecs
   requests:
     args: {}
     class_name: Requests

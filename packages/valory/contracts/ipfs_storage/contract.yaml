@@ -1,20 +1,20 @@
-name: erc20
+name: ipfs_storage
 author: valory
 version: 0.1.0
 type: contract
-description: ERC20 token contract
+description: ipfs_storage token contract
 license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   README.md: bafybeif7hmm6izsjzpricvczn6dgyky22g3fryjmni7qdf6gybaalgmv5a
-  __init__.py: bafybeiakinrsb2vekfckyvjewz2c3quhf5gq2556royhuxiu4uhhscgo6m
-  build/ERC20.json: bafybeidc2ciuhnallxjzy4pmq3xhlcm5sotszmwk4ekrhebzncowozxrpa
-  contract.py: bafybeig3mdi77e4kka5ubctocv6zo6lxynn2tstcqh4x3t7ot7qgqudlae
+  __init__.py: bafybeih7rzozhcny5v6aqaw6sjks2xzisuinhbeb2dm6mlwlwseaawv2h4
+  build/IPFSDataStorage.json: bafybeifmv6pmebsj2bshrtasyu3h3hxpxnpomhuajwkbs72qrbtsohe23a
+  contract.py: bafybeif3acsk32h7k2udwrnwkc75oxfdozpcug6yns5wyrv5nyjq5s3q5m
 fingerprint_ignore_patterns: []
 contracts: []
-class_name: ERC20
+class_name: IPFSDataStorage
 contract_interface_paths:
-  ethereum: build/ERC20.json
+  ethereum: build/IPFSDataStorage.json
 dependencies:
   ecdsa:
     version: '>=0.15'

@@ -404,7 +404,7 @@ class TxPreparationBehaviour(
             payload = TxPreparationPayload(
                 sender=sender, tx_submitter=self.auto_behaviour_id(), tx_hash=tx_hash
             )
-
+    
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
             yield from self.wait_until_round_end()
@@ -552,7 +552,7 @@ class TxPreparationBehaviour(
                 "data": bytes.fromhex(erc20_transfer_data_hex),
             }
         )
-
+    
         # Multisend call
         contract_api_msg = yield from self.get_contract_api_response(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore

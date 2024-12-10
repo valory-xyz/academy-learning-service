@@ -51,9 +51,7 @@ class Params(BaseParams):
             "coingecko_price_template", kwargs, str
         )
         self.coingecko_api_key = kwargs.get("coingecko_api_key", None)
-        self.transfer_target_address = self._ensure(
-            "transfer_target_address", kwargs, str
-        )
+        self.transfer_target_address = kwargs.get("transfer_target_address", None)
         self.olas_token_address = self._ensure("olas_token_address", kwargs, str)
 
         # multisend address is used in other skills, so we cannot pop it using _ensure

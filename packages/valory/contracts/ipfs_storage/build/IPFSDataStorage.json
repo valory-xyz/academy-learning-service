@@ -1,0 +1,536 @@
+{
+	"_format": "",
+	"contractName": "",
+	"sourceName": "",
+	"abi": [
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_historicalIpfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "_recentIpfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "_realIpfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "_topCryptoIpfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "_socialMediaSentimentIpfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "string",
+					"name": "_regulatoryGeographicIpfsHash",
+					"type": "string"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "constructor"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"name": "ComprehensiveCryptoInsightsListDataStored",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"name": "HistoricalDataStored",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"name": "RealDataStored",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"name": "RecentDataStored",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"name": "RegulatoryGeographicDataStored",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"name": "SocialMediaSentimentDataStored",
+			"type": "event"
+		},
+		{
+			"anonymous": false,
+			"inputs": [
+				{
+					"indexed": false,
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"name": "TopCryptoDataStored",
+			"type": "event"
+		},
+		{
+			"inputs": [],
+			"name": "comprehensiveCryptoInsightsListData",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getComprehensiveCryptoInsightsListIPFS",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getHistoricalDataIPFS",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getRealDataIPFS",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getRecentDataIPFS",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getRegulatoryGeographicDataIPFS",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getSocialMediaSentimentDataIPFS",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getTopCryptoDataIPFS",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "historicalData",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "owner",
+			"outputs": [
+				{
+					"internalType": "address",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "realData",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "recentData",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "regulatoryGeographicData",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "socialMediaSentimentData",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "topCryptoData",
+			"outputs": [
+				{
+					"internalType": "string",
+					"name": "ipfsHash",
+					"type": "string"
+				},
+				{
+					"internalType": "uint256",
+					"name": "timestamp",
+					"type": "uint256"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_ipfsHash",
+					"type": "string"
+				}
+			],
+			"name": "updateComprehensiveCryptoInsightsListIpfs",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_ipfsHash",
+					"type": "string"
+				}
+			],
+			"name": "updateHistoricalData",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_ipfsHash",
+					"type": "string"
+				}
+			],
+			"name": "updateRealData",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_ipfsHash",
+					"type": "string"
+				}
+			],
+			"name": "updateRecentData",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_ipfsHash",
+					"type": "string"
+				}
+			],
+			"name": "updateRegulatoryGeographicData",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_ipfsHash",
+					"type": "string"
+				}
+			],
+			"name": "updateSocialMediaSentimentData",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "string",
+					"name": "_ipfsHash",
+					"type": "string"
+				}
+			],
+			"name": "updateTopCryptoData",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		}
+	],
+	"bytecode": "",
+	"deployedBytecode": "",
+	"linkReferences": {},
+	"deployedLinkReferences": {}
+  }

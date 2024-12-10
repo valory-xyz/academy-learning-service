@@ -1,11 +1,11 @@
-agent_name: learning_agent
+agent_name: crypto_insight_agent
 author: valory
 version: 0.1.0
 license: Apache-2.0
 description: A learning agent.
 aea_version: '>=1.19.0, <2.0.0'
 fingerprint:
-  __init__.py: bafybeie5m76ta46xggcm6dyxszq7ktm5jmcikgqoxho6sttnzvogn52zdq
+  __init__.py: bafybeidxvjyma3cgnk6lyd2g4tp5u6tql3jjr5r2rn4ke5ejaa6lax43aq
 fingerprint_ignore_patterns: []
 connections:
 - valory/abci:0.1.0:bafybeiejymu4ul62zx6weoibnlsrfprfpjnplhjefz6sr6izgdr4sajlnu
@@ -19,7 +19,8 @@ contracts:
 - valory/gnosis_safe_proxy_factory:0.1.0:bafybeicpcpyurm7gxir2gnlsgzeirzomkhcbnzr5txk67zdf4mmg737rtu
 - valory/multisend:0.1.0:bafybeig5byt5urg2d2bsecufxe5ql7f4mezg3mekfleeh32nmuusx66p4y
 - valory/service_registry:0.1.0:bafybeihafe524ilngwzavkhwz4er56p7nyar26lfm7lrksfiqvvzo3kdcq
-- valory/erc20:0.1.0:bafybeibyhuxozkkvsymqz45vxixr3w3bs4vsvxg2nsx5jlyi3f3hhn7ezi
+- valory/erc20:0.1.0:bafybeihoudwg7wrjh47vkcf2z3frpq7rscikqhc2oissozl6q34uay4dfm
+- valory/ipfs_storage:0.1.0:bafybeifoca6bjxnvtrswerkpb7jmnnox5wwdrys2dsorrzans4qhyaxroi
 protocols:
 - open_aea/signing:1.0.0:bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi
 - valory/abci:0.1.0:bafybeiaqmp7kocbfdboksayeqhkbrynvlfzsx4uy4x6nohywnmaig4an7u
@@ -32,8 +33,9 @@ protocols:
 skills:
 - valory/abstract_abci:0.1.0:bafybeidz54kvxhbdmpruzguuzzq7bjg4pekjb5amqobkxoy4oqknnobopu
 - valory/abstract_round_abci:0.1.0:bafybeiajjzuh6vf23crp55humonknirvv2f4s3dmdlfzch6tc5ow52pcgm
-- valory/learning_abci:0.1.0:bafybeih5m372dqrdfy7w6iah4m5qfgf3j5t7ihsgorzyzhax5srm32wmim
-- valory/learning_chained_abci:0.1.0:bafybeihu6uvvdnfntgluhrbxqus5malsit36xqsyxv46wjqsmuodadarpm
+- valory/learning_abci:0.1.0:bafybeid3xvgro6qbjymhpxmg46jraf75zfx462kp6reotkvlxn72x33xji
+- valory/token_data_collection_abci:0.1.0:bafybeickiiwapmwq26n26j7ds32snneefvno4hlgcoifhw6sn3fwy2v3rm
+- valory/learning_chained_abci:0.1.0:bafybeih2sowv5niowyss6j5eo5bktkz2pjhwac72fr3tgjllp4mp7axgba
 - valory/registration_abci:0.1.0:bafybeiffipsowrqrkhjoexem7ern5ob4fabgif7wa6gtlszcoaop2e3oey
 - valory/reset_pause_abci:0.1.0:bafybeif4lgvbzsmzljesxbphycdv52ka7qnihyjrjpfaseclxadcmm6yiq
 - valory/termination_abci:0.1.0:bafybeiekkpo5qef5zaeagm3si6v45qxcojvtjqe4a5ceccvk4q7k3xi3bi
@@ -200,6 +202,8 @@ models:
       multisend_batch_size: ${int:50}
       ipfs_address: ${str:https://gateway.autonolas.tech/ipfs/}
       coingecko_price_template: ${str:https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}}
+      coingecko_histroy_data_template: ${str:https://api.coingecko.com/api/v3/coins/}
+      ipfs_storage_contract: ${str:'0x5eA0bae9D62bB3dD7A5714e8CA54f4A02B3cb682'}
       coingecko_api_key: ${str:null}
       default_chain_id: ${str:gnosis}
       termination_from_block: ${int:34088325}
@@ -219,3 +223,19 @@ models:
       response_type: dict
       retries: 5
       url: https://api.coingecko.com/api/v3/simple/price
+  coingecko_top_cryptocurrencies_specs:
+    args:
+      api_id: coingecko
+      headers:
+        Accept: application/json
+      method: GET
+      parameters:
+        vs_currency: usd
+        order: market_cap_desc
+        per_page: 10
+        page: 1
+        sparkline: false
+      response_key: null
+      response_type: list
+      retries: 5
+      url: https://api.coingecko.com/api/v3/coins/markets

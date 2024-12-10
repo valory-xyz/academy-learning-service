@@ -1,0 +1,43 @@
+alphabet_in:
+- DONE
+- ERROR
+- NO_MAJORITY
+- ROUND_TIMEOUT
+default_start_state: TopCryptoListDataCollectionRound
+final_states:
+- FinishedRealTimeDataStreamingRound
+label: TokenDataCollectionAbciApp
+start_states: TopCryptoListDataCollectionRound
+states:
+- HistoricalDataCollectionRound
+- ComprehensiveCryptoInsightsRound
+- CryptoTxPreparationRound
+- FinishedRealTimeDataStreamingRound
+- RealTimeDataStreamingRound
+- RecentDataCollectionRound
+- TopCryptoListDataCollectionRound
+transition_func:
+    (HistoricalDataCollectionRound, DONE): RecentDataCollectionRound
+    (HistoricalDataCollectionRound, NO_MAJORITY): HistoricalDataCollectionRound
+    (HistoricalDataCollectionRound, ROUND_TIMEOUT): HistoricalDataCollectionRound
+    (HistoricalDataCollectionRound, ERROR): HistoricalDataCollectionRound
+    (ComprehensiveCryptoInsightsRound, DONE): CryptoTxPreparationRound
+    (ComprehensiveCryptoInsightsRound, NO_MAJORITY): ComprehensiveCryptoInsightsRound
+    (ComprehensiveCryptoInsightsRound, ROUND_TIMEOUT): ComprehensiveCryptoInsightsRound
+    (ComprehensiveCryptoInsightsRound, ERROR): ComprehensiveCryptoInsightsRound
+    (CryptoTxPreparationRound, DONE): FinishedRealTimeDataStreamingRound
+    (CryptoTxPreparationRound, NO_MAJORITY): CryptoTxPreparationRound
+    (CryptoTxPreparationRound, ROUND_TIMEOUT): CryptoTxPreparationRound
+    (CryptoTxPreparationRound, ERROR): CryptoTxPreparationRound
+    (RealTimeDataStreamingRound, DONE): ComprehensiveCryptoInsightsRound
+    (RealTimeDataStreamingRound, NO_MAJORITY): RealTimeDataStreamingRound
+    (RealTimeDataStreamingRound, ROUND_TIMEOUT): RealTimeDataStreamingRound
+    (RealTimeDataStreamingRound, ERROR): RealTimeDataStreamingRound
+    (RecentDataCollectionRound, DONE): RealTimeDataStreamingRound
+    (RecentDataCollectionRound, NO_MAJORITY): RecentDataCollectionRound
+    (RecentDataCollectionRound, ROUND_TIMEOUT): RecentDataCollectionRound
+    (RecentDataCollectionRound, ERROR): RecentDataCollectionRound
+    (TopCryptoListDataCollectionRound, DONE): HistoricalDataCollectionRound
+    (TopCryptoListDataCollectionRound, NO_MAJORITY): TopCryptoListDataCollectionRound
+    (TopCryptoListDataCollectionRound, ROUND_TIMEOUT): TopCryptoListDataCollectionRound
+    (TopCryptoListDataCollectionRound, ERROR): TopCryptoListDataCollectionRound
