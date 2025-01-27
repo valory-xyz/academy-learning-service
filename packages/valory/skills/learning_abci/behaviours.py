@@ -125,7 +125,7 @@ class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             sender = self.context.agent_address
 
-            # First mehtod to call an API: simple call to get_http_response
+            # First method to call an API: simple call to get_http_response
             price = yield from self.get_token_price_simple()
 
             # Second method to call an API: use ApiSpecs
