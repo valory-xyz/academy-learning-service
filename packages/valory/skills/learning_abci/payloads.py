@@ -54,7 +54,7 @@ class TxPreparationPayload(BaseTxPayload):
 class MechRequestPreparationPayload(BaseTxPayload):
     """Represent a transaction payload for the MechRequestPreparationRound."""
 
-    tx_submitter: Optional[str] = None
+    tx_submitter: str
     mech_requests: str
 
 

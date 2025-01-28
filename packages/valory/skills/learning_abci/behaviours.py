@@ -711,6 +711,8 @@ class MechRequestPreparationBehaviour(LearningBaseBehaviour):
                 )
             ]
 
+            self.context.logger.info(f"Mech requests: {mech_requests}")
+
             sender = self.context.agent_address
             payload = MechRequestPreparationPayload(
                 sender=sender,

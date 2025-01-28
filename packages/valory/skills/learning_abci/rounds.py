@@ -228,13 +228,13 @@ class MechRequestPreparationRound(CollectSameUntilThresholdRound):
         """Process the end of the block."""
 
         if self.threshold_reached:
-            payload = dict(zip(self.selection_key, self.most_voted_payload_values))
+            tx_submitter, mech_requests = self.most_voted_payload_values
 
             synchronized_data = self.synchronized_data.update(
                 synchronized_data_class=SynchronizedData,
                 **{
-                    get_name(SynchronizedData.mech_requests): payload["mech_requests"],
-                    get_name(SynchronizedData.tx_submitter): payload["tx_submitter"],
+                    get_name(SynchronizedData.mech_requests): mech_requests,
+                    get_name(SynchronizedData.tx_submitter): tx_submitter,
                 },
             )
 
@@ -305,11 +305,14 @@ class LearningAbciApp(AbciApp[Event]):
         },
         FinishedDecisionMakingRound: {},
         FinishedTxPreparationRound: {},
+        FinishedMechRequestPreparationRound: {},
         FinishedRound: {},
     }
     final_states: Set[AppState] = {
         FinishedDecisionMakingRound,
         FinishedTxPreparationRound,
+        FinishedMechRequestPreparationRound,
+        FinishedRound,
     }
     event_to_timeout: EventToTimeout = {}
     cross_period_persisted_keys: FrozenSet[str] = frozenset()
