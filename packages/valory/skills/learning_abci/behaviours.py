@@ -27,7 +27,7 @@ from tempfile import mkdtemp
 from typing import Dict, Generator, Optional, Set, Type, cast
 from uuid import uuid4
 
-from packages.valory.contracts.erc20custom.contract import ERC20
+from packages.valory.contracts.erc20custom.contract import ERC20Custom
 from packages.valory.contracts.gnosis_safe.contract import (
     GnosisSafeContract,
     SafeOperation,
@@ -230,7 +230,7 @@ class DataPullBehaviour(LearningBaseBehaviour):  # pylint: disable=too-many-ance
         response_msg = yield from self.get_contract_api_response(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
             contract_address=self.params.olas_token_address,
-            contract_id=str(ERC20.contract_id),
+            contract_id=str(ERC20Custom.contract_id),
             contract_callable="check_balance",
             account=self.synchronized_data.safe_contract_address,
             chain_id=GNOSIS_CHAIN_ID,
@@ -497,7 +497,7 @@ class TxPreparationBehaviour(
         response_msg = yield from self.get_contract_api_response(
             performative=ContractApiMessage.Performative.GET_RAW_TRANSACTION,  # type: ignore
             contract_address=self.params.olas_token_address,
-            contract_id=str(ERC20.contract_id),
+            contract_id=str(ERC20Custom.contract_id),
             contract_callable="build_transfer_tx",
             recipient=self.params.transfer_target_address,
             amount=1,
