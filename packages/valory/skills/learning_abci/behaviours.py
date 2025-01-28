@@ -27,7 +27,7 @@ from tempfile import mkdtemp
 from typing import Dict, Generator, Optional, Set, Type, cast
 from uuid import uuid4
 
-from packages.valory.contracts.erc20.contract import ERC20
+from packages.valory.contracts.erc20custom.contract import ERC20
 from packages.valory.contracts.gnosis_safe.contract import (
     GnosisSafeContract,
     SafeOperation,

@@ -1,6 +1,6 @@
 {
     "dev": {
-        "contract/valory/erc20/0.1.0": "bafybeifen3rx236w2u6snltkwn26pxbxaoyfdjlmatgm33u3dq4gwa63c4",
+        "contract/valory/erc20custom/0.1.0": "bafybeifen3rx236w2u6snltkwn26pxbxaoyfdjlmatgm33u3dq4gwa63c4",
         "skill/valory/learning_abci/0.1.0": "bafybeicjqz5cttvj74mpcpkdc3c2cqm5lpiwksibpf3jci7cujsijsomme",
         "skill/valory/learning_chained_abci/0.1.0": "bafybeia6vqhvm6jjpcynhqrqypom2v7b4tnxc3goyhxouvm5f7t2onuceu",
         "agent/valory/learning_agent/0.1.0": "bafybeiezockygpjp3f6xqdo22qzckmzvjaw4dk5b2qr3s6xxg2jdekzl4i",
@@ -23,6 +23,7 @@
         "contract/valory/mech/0.1.0": "bafybeielwbnikog4eqmu6bo537kzp2e7qpmkzt7l5zuuugp2w4r47dbvwu",
         "contract/valory/mech_marketplace/0.1.0": "bafybeicfuigpr65k4l2r5dbazzwh43yc6pfuy5mrkjkagmhmcp6ioktfay",
         "contract/valory/agent_registry/0.1.0": "bafybeibboljpn2zevzxnpgflxj6ykxk4bpxegtzjts25ajliaoadz35mca",
+        "contract/valory/erc20/0.1.0": "bafybeientdgpccdi7prtu4x53m5g3yugh5tuh5hnroylfz3wwzyjniqure",
         "connection/valory/abci/0.1.0": "bafybeie2bc44r2ddspeg4v7minuievvjykomcukuf5ryevom6fajno25gy",
         "connection/valory/http_client/0.23.0": "bafybeihi772xgzpqeipp3fhmvpct4y6e6tpjp4sogwqrnf3wqspgeilg4u",
         "connection/valory/ipfs/0.1.0": "bafybeias6633a2337nhq6nn5ikq4jaig47v63nxv2ixkjr6qqrqaywqara",
