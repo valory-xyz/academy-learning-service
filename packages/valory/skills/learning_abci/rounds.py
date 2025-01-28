@@ -111,6 +111,7 @@ class DataPullRound(CollectSameUntilThresholdRound):
     synchronized_data_class = SynchronizedData
     done_event = Event.DONE
     no_majority_event = Event.NO_MAJORITY
+    required_class_attributes = ()
 
     # Collection key specifies where in the synchronized data the agento to payload mapping will be stored
     collection_key = get_name(SynchronizedData.participant_to_data_round)
@@ -133,6 +134,7 @@ class DecisionMakingRound(CollectSameUntilThresholdRound):
 
     payload_class = DecisionMakingPayload
     synchronized_data_class = SynchronizedData
+    required_class_attributes = ()
 
     # Since we need to execute some actions after consensus, we override the end_block method
     # instead of just setting the selection and collection keys
@@ -160,6 +162,7 @@ class TxPreparationRound(CollectSameUntilThresholdRound):
     synchronized_data_class = SynchronizedData
     done_event = Event.DONE
     no_majority_event = Event.NO_MAJORITY
+    required_class_attributes = ()
     collection_key = get_name(SynchronizedData.participant_to_tx_round)
     selection_key = (
         get_name(SynchronizedData.tx_submitter),
