@@ -48,3 +48,18 @@ class TxPreparationPayload(BaseTxPayload):
 
     tx_submitter: Optional[str] = None
     tx_hash: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class MechRequestPreparationPayload(BaseTxPayload):
+    """Represent a transaction payload for the MechRequestPreparationRound."""
+
+    tx_submitter: Optional[str] = None
+    mech_requests: str
+
+
+@dataclass(frozen=True)
+class PostTransactionPayload(BaseTxPayload):
+    """Represent a transaction payload for the DecisionMakingRound."""
+
+    event: str

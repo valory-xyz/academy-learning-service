@@ -21,9 +21,11 @@
 
 import json
 from abc import ABC
+from dataclasses import asdict
 from pathlib import Path
 from tempfile import mkdtemp
 from typing import Dict, Generator, Optional, Set, Type, cast
+from uuid import uuid4
 
 from packages.valory.contracts.erc20.contract import ERC20
 from packages.valory.contracts.gnosis_safe.contract import (
@@ -50,6 +52,8 @@ from packages.valory.skills.learning_abci.models import (
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
     DecisionMakingPayload,
+    MechRequestPreparationPayload,
+    PostTransactionPayload,
     TxPreparationPayload,
 )
 from packages.valory.skills.learning_abci.rounds import (
@@ -57,6 +61,9 @@ from packages.valory.skills.learning_abci.rounds import (
     DecisionMakingRound,
     Event,
     LearningAbciApp,
+    MechMetadata,
+    MechRequestPreparationRound,
+    PostTransactionRound,
     SynchronizedData,
     TxPreparationRound,
 )
@@ -651,6 +658,73 @@ class TxPreparationBehaviour(
         return safe_tx_hash
 
 
+class PostTransactionBehaviour(
+    LearningBaseBehaviour
+):  # pylint: disable=too-many-ancestors
+    """TxPreparationBehaviour"""
+
+    matching_round: Type[AbstractRound] = PostTransactionRound
+
+    def async_act(self) -> Generator:
+        """Do the act, supporting asynchronous execution."""
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).local():
+            sender = self.context.agent_address
+
+            # After the normal transaction, we go to mech request preparation
+            if self.synchronized_data.tx_submitter == "tx_preparation_behaviour":
+                event = Event.MECH.value
+
+            # After the mech response, we log it and we are done
+            else:
+                self.context.logger.info(
+                    f"Mech responses: {self.synchronized_data.mech_responses}"
+                )
+                event = Event.DONE.value
+
+            payload = PostTransactionPayload(sender=sender, event=event)
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
+            yield from self.send_a2a_transaction(payload)
+            yield from self.wait_until_round_end()
+
+        self.set_done()
+
+
+class MechRequestPreparationBehaviour(LearningBaseBehaviour):
+    """MechRequestPreparationBehaviour"""
+
+    matching_round: Type[AbstractRound] = MechRequestPreparationRound
+
+    def async_act(self) -> Generator:
+        """Do the act, supporting asynchronous execution."""
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).local():
+            # Prepare the request
+            mech_requests = [
+                asdict(
+                    MechMetadata(
+                        nonce=str(uuid4()),
+                        tool="openai-gpt-3.5-turbo",
+                        prompt="What is the meaning of life?",
+                    )
+                )
+            ]
+
+            sender = self.context.agent_address
+            payload = MechRequestPreparationPayload(
+                sender=sender,
+                tx_submitter=self.auto_behaviour_id(),
+                mech_requests=json.dumps(mech_requests, sort_keys=True),
+            )
+
+        with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
+            yield from self.send_a2a_transaction(payload)
+            yield from self.wait_until_round_end()
+
+        self.set_done()
+
+
 class LearningRoundBehaviour(AbstractRoundBehaviour):
     """LearningRoundBehaviour"""
 
@@ -660,4 +734,6 @@ class LearningRoundBehaviour(AbstractRoundBehaviour):
         DataPullBehaviour,
         DecisionMakingBehaviour,
         TxPreparationBehaviour,
+        PostTransactionBehaviour,
+        MechRequestPreparationBehaviour,
     ]

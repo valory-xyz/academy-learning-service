@@ -19,6 +19,8 @@
 
 """This package contains the rounds of LearningAbciApp."""
 
+import json
+from dataclasses import dataclass
 from enum import Enum
 from typing import Dict, FrozenSet, Optional, Set, Tuple
 
@@ -37,8 +39,22 @@ from packages.valory.skills.abstract_round_abci.base import (
 from packages.valory.skills.learning_abci.payloads import (
     DataPullPayload,
     DecisionMakingPayload,
+    MechRequestPreparationPayload,
+    PostTransactionPayload,
     TxPreparationPayload,
 )
+from packages.valory.skills.mech_interact_abci.states.base import (
+    SynchronizedData as MechInteractionSynchronizedData,
+)
+
+
+@dataclass
+class MechMetadata:
+    """A Mech's metadata."""
+
+    prompt: str
+    tool: str
+    nonce: str
 
 
 class Event(Enum):
@@ -49,9 +65,10 @@ class Event(Enum):
     TRANSACT = "transact"
     NO_MAJORITY = "no_majority"
     ROUND_TIMEOUT = "round_timeout"
+    MECH = "mech"
 
 
-class SynchronizedData(BaseSynchronizedData):
+class SynchronizedData(MechInteractionSynchronizedData):
     """
     Class to represent the synchronized data.
 
@@ -172,6 +189,67 @@ class TxPreparationRound(CollectSameUntilThresholdRound):
     # Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
 
 
+class PostTransactionRound(CollectSameUntilThresholdRound):
+    """PostTransactionRound"""
+
+    payload_class = PostTransactionPayload
+    synchronized_data_class = SynchronizedData
+    required_class_attributes = ()
+
+    # Since we need to execute some actions after consensus, we override the end_block method
+    # instead of just setting the selection and collection keys
+    def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Event]]:
+        """Process the end of the block."""
+
+        if self.threshold_reached:
+            event = Event(self.most_voted_payload)
+            return self.synchronized_data, event
+
+        if not self.is_majority_possible(
+            self.collection, self.synchronized_data.nb_participants
+        ):
+            return self.synchronized_data, Event.NO_MAJORITY
+
+        return None
+
+    # Event.DONE, Event.ERROR, Event.TRANSACT, Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
+
+
+class MechRequestPreparationRound(CollectSameUntilThresholdRound):
+    """MechRequestPreparationRound"""
+
+    payload_class = MechRequestPreparationPayload
+    synchronized_data_class = SynchronizedData
+    required_class_attributes = ()
+
+    # Since we need to execute some actions after consensus, we override the end_block method
+    # instead of just setting the selection and collection keys
+    def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Event]]:
+        """Process the end of the block."""
+
+        if self.threshold_reached:
+            payload = dict(zip(self.selection_key, self.most_voted_payload_values))
+
+            synchronized_data = self.synchronized_data.update(
+                synchronized_data_class=SynchronizedData,
+                **{
+                    get_name(SynchronizedData.mech_requests): payload["mech_requests"],
+                    get_name(SynchronizedData.tx_submitter): payload["tx_submitter"],
+                },
+            )
+
+            return synchronized_data, Event.DONE
+
+        if not self.is_majority_possible(
+            self.collection, self.synchronized_data.nb_participants
+        ):
+            return self.synchronized_data, Event.NO_MAJORITY
+
+        return None
+
+    # Event.DONE, Event.ERROR, Event.TRANSACT, Event.ROUND_TIMEOUT  # this needs to be referenced for static checkers
+
+
 class FinishedDecisionMakingRound(DegenerateRound):
     """FinishedDecisionMakingRound"""
 
@@ -180,12 +258,21 @@ class FinishedTxPreparationRound(DegenerateRound):
     """FinishedLearningRound"""
 
 
+class FinishedMechRequestPreparationRound(DegenerateRound):
+    """FinishedMechRequestPreparationRound"""
+
+
+class FinishedRound(DegenerateRound):
+    """FinishedRound"""
+
+
 class LearningAbciApp(AbciApp[Event]):
     """LearningAbciApp"""
 
     initial_round_cls: AppState = DataPullRound
     initial_states: Set[AppState] = {
         DataPullRound,
+        PostTransactionRound,
     }
     transition_function: AbciAppTransitionFunction = {
         DataPullRound: {
@@ -205,8 +292,20 @@ class LearningAbciApp(AbciApp[Event]):
             Event.ROUND_TIMEOUT: TxPreparationRound,
             Event.DONE: FinishedTxPreparationRound,
         },
+        PostTransactionRound: {
+            Event.NO_MAJORITY: TxPreparationRound,
+            Event.ROUND_TIMEOUT: TxPreparationRound,
+            Event.MECH: MechRequestPreparationRound,
+            Event.DONE: FinishedRound,
+        },
+        MechRequestPreparationRound: {
+            Event.NO_MAJORITY: TxPreparationRound,
+            Event.ROUND_TIMEOUT: TxPreparationRound,
+            Event.DONE: FinishedMechRequestPreparationRound,
+        },
         FinishedDecisionMakingRound: {},
         FinishedTxPreparationRound: {},
+        FinishedRound: {},
     }
     final_states: Set[AppState] = {
         FinishedDecisionMakingRound,
@@ -216,8 +315,13 @@ class LearningAbciApp(AbciApp[Event]):
     cross_period_persisted_keys: FrozenSet[str] = frozenset()
     db_pre_conditions: Dict[AppState, Set[str]] = {
         DataPullRound: set(),
+        PostTransactionRound: set(),
     }
     db_post_conditions: Dict[AppState, Set[str]] = {
         FinishedDecisionMakingRound: set(),
         FinishedTxPreparationRound: {get_name(SynchronizedData.most_voted_tx_hash)},
+        FinishedMechRequestPreparationRound: {
+            get_name(SynchronizedData.most_voted_tx_hash)
+        },
+        FinishedRound: set(),
     }
