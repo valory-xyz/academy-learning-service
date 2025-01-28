@@ -7,7 +7,7 @@ license: Apache-2.0
 fingerprint:
   README.md: bafybeid42pdrf6qrohedylj4ijrss236ai6geqgf3he44huowiuf7pl464
 fingerprint_ignore_patterns: []
-agent: valory/learning_agent:0.1.0:bafybeid5agrnpybm5mhveqqxsh24fbnkupwzyw4xalumnkg5f4qcl24nye
+agent: valory/learning_agent:0.1.0:bafybeibwd7pjuzsrcw6jxzmwyya7465zdg5h5g4civzb2ox5f4wedpprba
 number_of_agents: 4
 deployment:
   agent:
@@ -97,13 +97,9 @@ extra:
     coingecko_specs:
       args:
         api_id: coingecko
-        headers:
-          Accept: application/json
+        headers: ${COINGECKO_HEADERS:dict:{"Content-Type":"application/json"}}
         method: GET
-        parameters:
-          ids: autonolas
-          vs_currencies: usd
-          x_cg_demo_api_key: ${COINGECKO_API_KEY:str:null}
+        parameters: ${COINGECKO_PARAMETERS:dict:{"ids":"autonolas","vs_currencies":"usd","x_cg_demo_api_key":"null"}}
         response_key: autonolas
         response_type: dict
         retries: 5
@@ -158,13 +154,9 @@ extra:
     coingecko_specs:
       args:
         api_id: coingecko
-        headers:
-          Accept: application/json
+        headers: ${COINGECKO_HEADERS:dict:{"Content-Type":"application/json"}}
         method: GET
-        parameters:
-          ids: autonolas
-          vs_currencies: usd
-          x_cg_demo_api_key: ${COINGECKO_API_KEY:str:null}
+        parameters: ${COINGECKO_PARAMETERS:dict:{"ids":"autonolas","vs_currencies":"usd","x_cg_demo_api_key":"null"}}
         response_key: autonolas
         response_type: dict
         retries: 5
@@ -219,13 +211,9 @@ extra:
     coingecko_specs:
       args:
         api_id: coingecko
-        headers:
-          Accept: application/json
+        headers: ${COINGECKO_HEADERS:dict:{"Content-Type":"application/json"}}
         method: GET
-        parameters:
-          ids: autonolas
-          vs_currencies: usd
-          x_cg_demo_api_key: ${COINGECKO_API_KEY:str:null}
+        parameters: ${COINGECKO_PARAMETERS:dict:{"ids":"autonolas","vs_currencies":"usd","x_cg_demo_api_key":"null"}}
         response_key: autonolas
         response_type: dict
         retries: 5
@@ -280,13 +268,9 @@ extra:
     coingecko_specs:
       args:
         api_id: coingecko
-        headers:
-          Accept: application/json
+        headers: ${COINGECKO_HEADERS:dict:{"Content-Type":"application/json"}}
         method: GET
-        parameters:
-          ids: autonolas
-          vs_currencies: usd
-          x_cg_demo_api_key: ${COINGECKO_API_KEY:str:null}
+        parameters: ${COINGECKO_PARAMETERS:dict:{"ids":"autonolas","vs_currencies":"usd","x_cg_demo_api_key":"null"}}
         response_key: autonolas
         response_type: dict
         retries: 5
